@@ -11,17 +11,14 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
     >
       {/* Left — Hamburger */}
       <div className="flex items-center gap-4">
-        <button
-          onClick={onMenuClick}
-          className=" hidden sm:block p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors"
-        >
-          <Menu size={20} />
-        </button>
-      </div>
-
-      {/* Center — Search */}
-      <div className="flex-1 max-w-xs mx-6">
-        <div className="relative">
+<div>
+      <button onClick={onMenuClick} className="md:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors">
+  <Menu size={20} />
+  
+</button>
+</div>
+  
+    <div className="relative">
           <Search
             size={15}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -34,6 +31,11 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
             className="w-full pl-9 pr-4 py-2 bg-[#F5F5F5] rounded-full text-sm text-gray-600 placeholder-gray-400 outline-none focus:ring-2 focus:ring-purple-100 border border-transparent focus:border-purple-200 transition-all"
           />
         </div>
+      </div>
+
+      {/* Center — Search */}
+      <div className="flex-1 max-w-xs mx-6">
+      
       </div>
 
       {/* Right — Bell + User */}

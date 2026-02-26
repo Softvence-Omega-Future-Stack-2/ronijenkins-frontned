@@ -1,1 +1,13 @@
+
+
 @import "tailwindcss";
+
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+:root {
+  --color-buttonColor: #926690;
+  --color-subHeadingBlack: #111A2D;
+}

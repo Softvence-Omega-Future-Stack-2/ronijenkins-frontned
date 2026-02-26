@@ -9,16 +9,16 @@ import Header from "../Component/Header";
 
 const DashboardLayout = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  // const [, setIsSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 
-  const toggleSidebar = (state: boolean) => setIsSidebarCollapsed(state);
+  // const toggleSidebar = (state: boolean) => setIsSidebarCollapsed(state);
 
-  const handleLogoutClick = () => {
-    setShowLogoutModal(true);
-    setMobileMenuOpen(false);
-  };
+  // const handleLogoutClick = () => {
+  //   setShowLogoutModal(true);
+  //   setMobileMenuOpen(false);
+  // };
 
 
 
@@ -27,7 +27,7 @@ const DashboardLayout = () => {
 
 
   return (
-    <div className="flex h-screen bg-[#F3F6F6] overflow-hidden">
+    <div className="flex h-screen bg-[#FAF7F5] overflow-hidden">
 
       {/* DESKTOP SIDEBAR */}
       <div
@@ -36,9 +36,9 @@ const DashboardLayout = () => {
 `}
       >
         <Sidebar
-          onLogoutClick={handleLogoutClick}
-          collapsed={isSidebarCollapsed}
-          onToggle={toggleSidebar}
+          // onLogoutClick={handleLogoutClick}
+  
+          // onToggle={toggleSidebar}
         />
       </div>
 
@@ -57,16 +57,16 @@ const DashboardLayout = () => {
         style={{ width: "280px" }}
       >
         <Sidebar
-          onLogoutClick={handleLogoutClick}
-          collapsed={false}
-          onToggle={() => {}}
-          closeMobileMenu={() => setMobileMenuOpen(false)}
+          // onLogoutClick={handleLogoutClick}
+          // collapsed={false}
+          // // onToggle={() => {}}
+          // closeMobileMenu={() => setMobileMenuOpen(false)}
         />
       </div>
 
       {/* MAIN CONTENT */}
       <div className="flex-1 flex flex-col min-w-0">
-        <Header onMobileMenuOpen={() => setMobileMenuOpen(true)} />
+       <Header onMenuClick={() => setMobileMenuOpen(true)} />
 
         <main className="flex-1 overflow-y-auto w-full ">
           <Outlet />
@@ -77,7 +77,7 @@ const DashboardLayout = () => {
             onConfirm={() => {
             
               setShowLogoutModal(false);
-              navigate("/login");
+              // navigate("/login");
             }}
             onCancel={() => setShowLogoutModal(false)}
           />
