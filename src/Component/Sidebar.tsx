@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {  Users, LogOut,   FileText } from 'lucide-react';
+import logo from '../../public/img/logo.png'
 
 interface NavItem {
   id: string;
@@ -87,25 +88,14 @@ const Sidebar: React.FC = () => {
 
   return (
     <div
-      style={{ fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif" }}
+     
       className="w-full h-full bg-[#FAFAFA] flex flex-col overflow-hidden"
     >
       {/* Logo */}
       <div className="px-6 pt-8 pb-6 flex items-center gap-2.5">
-        <NavelleLogoIcon />
+       
         <div>
-          <div
-            className="text-[#2D2040] font-bold tracking-wide leading-none"
-            style={{ fontSize: '18px', letterSpacing: '0.04em' }}
-          >
-            Navelle
-          </div>
-          <div
-            className="text-[#9B8BB4] font-medium tracking-[0.18em] uppercase"
-            style={{ fontSize: '8px', marginTop: '2px' }}
-          >
-            Health
-          </div>
+          <img src={logo} alt="" />
         </div>
       </div>
 
@@ -128,7 +118,7 @@ const Sidebar: React.FC = () => {
                 onClick={() => navigate(item.path)}
                 className={`w-full flex items-center gap-3 px-4 py-[10px] rounded-xl transition-all duration-200 cursor-pointer text-left group ${
                   active
-                    ? 'bg-[#7C5CBF] text-white shadow-md shadow-purple-200'
+                    ? 'bg-[#926690] text-white shadow-md shadow-purple-200'
                     : 'text-[#6B6480] hover:bg-[#F0EBF8] hover:text-[#7C5CBF]'
                 }`}
               >
