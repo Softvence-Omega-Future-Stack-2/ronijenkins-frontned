@@ -60,11 +60,11 @@ const OverviewCard = () => {
       {stats.map((stat) => (
         <div
           key={stat.id}
-          className="bg-white rounded-2xl p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow duration-200"
+          className="bg-white rounded-4xl p-6  flex flex-col gap-3 border border-borderColor  transition-shadow duration-200"
           style={{ fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif" }}
         >
           {/* Top row: icon + change */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             {/* Icon */}
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -93,7 +93,7 @@ const OverviewCard = () => {
 
           {/* Label */}
           <div
-            className="text-[#B0A3C4] font-semibold tracking-[0.10em] uppercase"
+            className="text-subTitleColor font-extrabold text-xs leading-4  tracking-[0.10em] uppercase mb-1"
             style={{ fontSize: "10px" }}
           >
             {stat.label}
@@ -101,7 +101,7 @@ const OverviewCard = () => {
 
           {/* Value */}
           <div
-            className="text-[#1E1333] font-bold leading-none"
+            className="text-titleColor text-2xl md:text-[30px] font-extrabold leading-none"
             style={{ fontSize: "28px", letterSpacing: "-0.02em" }}
           >
             {stat.value}

@@ -9,6 +9,8 @@ import GlobalOverview from "../pages/GlobalOverview";
 import ContentCms from "../pages/ContentCms";
 import AiLogic from "../pages/AILogic";
 import Subscription from "../pages/Subscription";
+import CreateBroadcast from "../Component/globalOverview/CreateBroadcast";
+import UserProfileDetail from "../Component/userManagment/UserDetails";
 
 
 
@@ -23,8 +25,11 @@ const routes = createBrowserRouter([
         element: <DashboardLayout />,
         children: [
           { index: true, element: <GlobalOverview /> },
+          { path: "add-brodcast", element: <CreateBroadcast /> },
         //   { path: '', element: <Dashboard /> },
        { path: "users-managment", element: <UserManagmentPage /> },
+       { path: "users-managment/:id", element: <UserProfileDetail/> },
+
        { path: "content-cms", element: <ContentCms /> },
    
        { path: "ai-logic", element: <AiLogic/> },

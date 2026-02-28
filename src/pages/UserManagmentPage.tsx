@@ -1,10 +1,12 @@
 // import UserManagement from "../Component/userManagment/UserManagment"
 
+import UserManagement from "../Component/userManagment/UserManagment"
+
 
 const UserManagmentPage = () => {
   return (
     <div>
-    dsgfdgdf
+    <UserManagement/>
     </div>
   )
 }

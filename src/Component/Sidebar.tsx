@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {  Users, LogOut,   FileText } from 'lucide-react';
 import logo from '../../public/img/logo.png'
@@ -37,19 +37,12 @@ const SubscriptionsIcon = () => (
   </svg>
 );
 
-const NavelleLogoIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
-    <circle cx="20" cy="20" r="18" fill="#8B6FE8" opacity="0.15"/>
-    <path d="M12 28L20 12L28 28" stroke="#8B6FE8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M14.5 23h11" stroke="#8B6FE8" strokeWidth="2" strokeLinecap="round"/>
-  </svg>
-);
+
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [open, setOpen] = useState(false);
-  const dropdownRef = useRef(null);
+ 
 
   const menuItems: NavItem[] = [
     {
@@ -118,8 +111,8 @@ const Sidebar: React.FC = () => {
                 onClick={() => navigate(item.path)}
                 className={`w-full flex items-center gap-3 px-4 py-[10px] rounded-xl transition-all duration-200 cursor-pointer text-left group ${
                   active
-                    ? 'bg-[#926690] text-white shadow-md shadow-purple-200'
-                    : 'text-[#6B6480] hover:bg-[#F0EBF8] hover:text-[#7C5CBF]'
+                    ? 'bg-buttonColor text-white shadow-md shadow-purple-200'
+                    : 'text-subTitleColor hover:bg-[#F0EBF8] hover:text-[#7C5CBF]'
                 }`}
               >
                 <div
@@ -131,7 +124,7 @@ const Sidebar: React.FC = () => {
                 </div>
                 <span
                   className={`font-medium leading-tight whitespace-pre-line ${
-                    active ? 'text-white' : 'text-[#4A3F62]'
+                    active ? 'text-white' : 'text-subTitleColor'
                   }`}
                   style={{ fontSize: '13.5px' }}
                 >
