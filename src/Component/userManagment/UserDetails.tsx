@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 
 interface TopicBadge {
@@ -47,6 +48,9 @@ export default function UserProfileDetail() {
     setShowConfirm(false);
   };
 
+  const [selectedOption, setSelectedOption] = useState("notify");
+const [reason, setReason] = useState("");
+
   return (
     <div className="min-h-screen bg-[#f5f0eb] p-4 sm:p-6 lg:p-8 font-sans">
 
@@ -59,15 +63,15 @@ export default function UserProfileDetail() {
       </button>
 
       {/* Card */}
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8 relative">
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8 md:p-10 relative">
 
 
 
         {/* Main grid */}
-        <div className="flex flex-col sm:flex-row gap-6 sm:gap-8">
+        <div className="flex flex-col lg:flex-row gap-6 sm:gap-8">
 
           {/* Left: Avatar + Name */}
-          <div className="flex flex-col items-start gap-3 sm:w-44 flex-shrink-0">
+         <div className="flex flex-col items-start gap-3 w-full lg:w-44 flex-shrink-0 lg:border-r border-borderColor">
             {imgError ? (
               <div className="w-28 h-28 rounded-2xl bg-[#e9d5f5] flex items-center justify-center text-[#7c4d8a] text-3xl font-bold">
                 {profile.name[0]}
@@ -76,57 +80,74 @@ export default function UserProfileDetail() {
               <img
                 src={profile.avatar}
                 alt={profile.name}
-                className="w-28 h-28 rounded-2xl object-cover"
+                className="w-28 h-28 rounded-[40px] object-cover mb-4"
                 onError={(_e: React.SyntheticEvent<HTMLImageElement>) => setImgError(true)}
               />
             )}
             <div>
-              <h2 className="text-xl font-bold text-[#2a1f1f]">{profile.name}</h2>
-              <p className="text-sm text-gray-400">{profile.email}</p>
+              <h2 className="text-xl md:text-2xl  font-extrabold text-titleColor leading-6 md:leading-9 ">{profile.name}</h2>
+              <p className="text-sm text-[#4A3A3766] font-normal leading-6 mb-4">{profile.email}</p>
             </div>
-            <span className="text-[10px] font-bold tracking-widest text-[#9333ea] border border-[#e9d5f5] px-3 py-1.5 rounded-full uppercase">
+            <span className="text-[10px] font-bold tracking-widest text-[#9333ea] bg-[#9266900D] border border-[#9266901A] px-3 py-1.5 rounded-full uppercase">
               {profile.stage}
             </span>
           </div>
 
-          {/* Middle: Registration Details + Log Preferences */}
-          <div className="flex-1 flex flex-col gap-6">
+     <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8">
+           {/* Middle: Registration Details + Log Preferences */}
+          <div className="flex-1 flex flex-col gap-6 lg:ml-10">
             {/* Registration Details */}
             <div>
-              <p className="text-[10px] font-extrabold tracking-[2px] leading-4 text-[#4A3A3733] uppercase mb-3">Registration Details</p>
+              <p className="text-[10px] font-extrabold tracking-[2px] leading-4 text-[#4A3A3733] uppercase mb-2">Registration Details</p>
               <div className="flex flex-col gap-2.5">
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 mb-3">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-gray-300 flex-shrink-0">
                     <rect x="1" y="2" width="12" height="11" rx="2" stroke="currentColor" strokeWidth="1.3" />
                     <path d="M4 1v2M10 1v2M1 6h12" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
                   </svg>
-                  <span className="text-sm text-[#2a1f1f]">Joined: {profile.joined}</span>
+                  <span className="text-sm text-[#4A3A37B2] font-normal leading-5 ">Joined: {profile.joined}</span>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-gray-300 flex-shrink-0">
-                    <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3" />
-                    <path d="M7 4v3l2 1" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-                  </svg>
-                  <span className="text-sm text-[#2a1f1f]">Region: {profile.region}</span>
+                <div className="flex items-center gap-2.5 mb-3">
+                 
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+  <g clip-path="url(#clip0_211_10348)">
+    <path d="M7.99129 14.6504C11.6691 14.6504 14.6505 11.669 14.6505 7.99116C14.6505 4.31336 11.6691 1.33191 7.99129 1.33191C4.31348 1.33191 1.33203 4.31336 1.33203 7.99116C1.33203 11.669 4.31348 14.6504 7.99129 14.6504Z" stroke="#4A3A37" stroke-opacity="0.2" stroke-width="1.33185" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7.99085 1.33191C6.28091 3.12735 5.32715 5.51175 5.32715 7.99116C5.32715 10.4706 6.28091 12.855 7.99085 14.6504C9.70079 12.855 10.6546 10.4706 10.6546 7.99116C10.6546 5.51175 9.70079 3.12735 7.99085 1.33191Z" stroke="#4A3A37" stroke-opacity="0.2" stroke-width="1.33185" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M1.33203 7.99109H14.6505" stroke="#4A3A37" stroke-opacity="0.2" stroke-width="1.33185" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <defs>
+    <clipPath id="clip0_211_10348">
+      <rect width="15.9822" height="15.9822" fill="white"/>
+    </clipPath>
+  </defs>
+</svg>
+                  <span className="text-sm text-[#4A3A37B2] font-normal leading-5 ">Region: {profile.region}</span>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-gray-300 flex-shrink-0">
-                    <rect x="1.5" y="1.5" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="1.3" />
-                    <path d="M4 5h6M4 7.5h4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-                  </svg>
-                  <span className="text-sm text-[#2a1f1f]">Contact: {profile.contact}</span>
+                <div className="flex items-center  gap-2.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+  <g clip-path="url(#clip0_211_10355)">
+    <path d="M14.6505 4.6615L8.6632 8.47525C8.46003 8.59326 8.22925 8.65542 7.99428 8.65542C7.75932 8.65542 7.52854 8.59326 7.32536 8.47525L1.33203 4.6615" stroke="#4A3A37" stroke-opacity="0.2" stroke-width="1.33185" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M13.3187 2.6637H2.66388C1.92832 2.6637 1.33203 3.25999 1.33203 3.99555V11.9867C1.33203 12.7222 1.92832 13.3185 2.66388 13.3185H13.3187C14.0542 13.3185 14.6505 12.7222 14.6505 11.9867V3.99555C14.6505 3.25999 14.0542 2.6637 13.3187 2.6637Z" stroke="#4A3A37" stroke-opacity="0.2" stroke-width="1.33185" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <defs>
+    <clipPath id="clip0_211_10355">
+      <rect width="15.9822" height="15.9822" fill="white"/>
+    </clipPath>
+  </defs>
+</svg>
+                  <span className="text-sm text-[#4A3A37B2] font-normal leading-5 ">Contact: {profile.contact}</span>
                 </div>
               </div>
             </div>
 
             {/* Log Preferences */}
             <div>
-              <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-3">Log Preferences</p>
+              <p className="text-[10px] font-extrabold tracking-[2px] leading-4 text-[#4A3A3733] uppercase mb-2">Log Preferences</p>
               <div className="flex flex-wrap gap-2">
                 {profile.logPreferences.map((pref: string) => (
                   <span
                     key={pref}
-                    className="text-xs font-semibold bg-[#f7f3f0] text-[#6b5b5b] px-3 py-1.5 rounded-full"
+                    className="text-[10px] font-semibold bg-[#FAF7F5] border border-borderColor text-titleColor  px-4 py-2 rounded-[10px]"
                   >
                     {pref}
                   </span>
@@ -136,15 +157,15 @@ export default function UserProfileDetail() {
           </div>
 
           {/* Right: Topics of Interest + Suspend */}
-          <div className="flex flex-col gap-6 sm:w-56 flex-shrink-0">
+          <div className="flex flex-col gap-6  flex-shrink-0">
             {/* Topics */}
             <div>
-              <p className="text-[10px] font-bold tracking-widest text-gray-400 uppercase mb-3">Topics of Interest</p>
-              <div className="flex flex-wrap gap-2">
+              <p className="text-[10px] font-extrabold tracking-[2px] leading-4 text-[#4A3A3733] uppercase mb-2">Topics of Interest</p>
+              <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row gap-2 mb-4">
                 {profile.topics.map((t: TopicBadge) => (
                   <span
                     key={t.label}
-                    className="text-xs font-semibold border border-gray-200 text-[#6b5b5b] px-3 py-1.5 rounded-full"
+                    className="text-xs font-semibold border border-[#9266901A] text-buttonColor bg-[#9266900D] px-4 py-2 rounded-full"
                   >
                     {t.label}
                   </span>
@@ -156,7 +177,7 @@ export default function UserProfileDetail() {
             <div>
               <button
                 onClick={handleSuspendClick}
-                className={`w-full py-3 rounded-2xl border text-xs font-bold tracking-widest uppercase transition-all ${
+                className={`w-full py-3 rounded-2xl border border-[#ECC3B44D] text-xs font-extrabold tracking-widest uppercase transition-all cursor-pointer ${
                   suspended
                     ? "border-green-200 text-green-500 hover:bg-green-50"
                     : "border-gray-100 text-red-400 hover:bg-red-50 hover:border-red-100"
@@ -169,38 +190,108 @@ export default function UserProfileDetail() {
               )}
             </div>
           </div>
+       </div>
         </div>
       </div>
 
       {/* Confirm Modal */}
       {showConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/10"
-            onClick={() => setShowConfirm(false)}
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20">
+
+    <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 relative">
+
+      {/* Close Button */}
+      <button
+        onClick={() => setShowConfirm(false)}
+        className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl cursor-pointer"
+      >
+        ×
+      </button>
+
+      {/* Title */}
+      <h3 className="text-base md:text-lg font-bold text-[#0A0A0A] mb-2">
+        Suspend Account
+      </h3>
+
+      <p className="text-sm text-[#6A7282] font-normal leading-5 mb-6">
+        Are you sure you want to suspend {profile.name}? This action will
+        prevent the user from logging in.
+      </p>
+
+      {/* Options */}
+      <div className="space-y-4 py-4 mb-6">
+
+        {/* Option 1 */}
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="radio"
+            name="suspendOption"
+            value="notify"
+            checked={selectedOption === "notify"}
+            onChange={(e) => setSelectedOption(e.target.value)}
+            className="mt-1 accent-red-500"
           />
-          <div className="relative z-10 bg-white rounded-3xl shadow-xl p-6 w-full max-w-xs mx-4">
-            <h3 className="text-base font-bold text-[#2a1f1f] mb-2">Suspend Account?</h3>
-            <p className="text-sm text-gray-400 mb-5">
-              {profile.name} will lose access to the platform immediately.
+          <span className="text-sm text-[#0A0A0A] font-normal leading-5">
+            Notify user of suspension
+          </span>
+        </label>
+
+        {/* Option 2 */}
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="radio"
+            name="suspendOption"
+            value="export"
+            checked={selectedOption === "export"}
+            onChange={(e) => setSelectedOption(e.target.value)}
+            className="mt-1 accent-red-500"
+          />
+          <div>
+            <p className="text-sm text-[#0A0A0A] font-normal leading-5 mb-1">
+              Send data export
             </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowConfirm(false)}
-                className="flex-1 py-2.5 rounded-full border-2 border-gray-200 text-sm font-bold text-gray-400 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmSuspend}
-                className="flex-1 py-2.5 rounded-full bg-red-400 text-white text-sm font-bold hover:bg-red-500 transition-colors"
-              >
-                Suspend
-              </button>
-            </div>
+            <p className="text-xs text-[#6A7282] font-normal leading-4">
+              Ensures the user can access their information upon request.
+            </p>
           </div>
-        </div>
-      )}
+        </label>
+
+      </div>
+
+      {/* Reason Field */}
+      <div className="mb-6">
+        <label className="text-sm text-[#0A0A0A] font-normal leading-5 mb-2">
+          Reason for suspension (Optional)
+        </label>
+
+        <textarea
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          placeholder="Enter reason for suspension..."
+          className="w-full h-28 border border-gray-200 rounded-xl mt-2 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 resize-none"
+        />
+      </div>
+
+      {/* Footer Buttons */}
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={() => setShowConfirm(false)}
+          className="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 cursor-pointer"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleConfirmSuspend}
+          className="px-5 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 cursor-pointer"
+        >
+          Suspend Account
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
     </div>
   );
 }

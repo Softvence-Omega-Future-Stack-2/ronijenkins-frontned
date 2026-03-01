@@ -11,6 +11,8 @@ import AiLogic from "../pages/AILogic";
 import Subscription from "../pages/Subscription";
 import CreateBroadcast from "../Component/globalOverview/CreateBroadcast";
 import UserProfileDetail from "../Component/userManagment/UserDetails";
+import CreateContentForm from "../Component/ContentCms/CreatEditContent";
+import EditContentForm from "../Component/ContentCms/EditContent";
 
 
 
@@ -31,6 +33,8 @@ const routes = createBrowserRouter([
        { path: "users-managment/:id", element: <UserProfileDetail/> },
 
        { path: "content-cms", element: <ContentCms /> },
+       { path: "create-content", element: <CreateContentForm /> },
+       { path: "edit-content/:id", element: <EditContentForm /> },
    
        { path: "ai-logic", element: <AiLogic/> },
        { path: "subscription", element: <Subscription /> },
