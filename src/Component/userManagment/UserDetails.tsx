@@ -15,7 +15,7 @@ interface UserProfile {
   contact: string;
   logPreferences: string[];
   topics: TopicBadge[];
-}
+} 
 
 
 const profile: UserProfile = {
