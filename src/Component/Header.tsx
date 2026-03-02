@@ -1,8 +1,10 @@
 import { Menu, Search, Bell } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const [searchValue, setSearchValue] = useState('');
+  const navigate = useNavigate()
 
   return (
     <header
@@ -18,30 +20,27 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
 </button>
 </div>
   
-    <div className="relative">
-          <Search
-            size={15}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-          />
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-[#F5F5F5] rounded-full text-sm text-gray-600 placeholder-gray-400 outline-none focus:ring-2 focus:ring-purple-100 border border-transparent focus:border-purple-200 transition-all"
-          />
-        </div>
+ <div className="relative flex-1 min-w-0 max-w-[500px]">
+  <Search
+    size={15}
+    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+  />
+  <input
+    type="text"
+    placeholder="Search..."
+    value={searchValue}
+    onChange={(e) => setSearchValue(e.target.value)}
+    className="w-full pl-9 pr-4 py-2 bg-[#FAF7F5] rounded-full text-sm text-gray-600 border border-borderColor placeholder-gray-400 outline-none focus:ring-2 focus:ring-purple-100 focus:border-purple-200 transition-all"
+  />
+</div>
       </div>
 
-      {/* Center — Search */}
-      <div className="flex-1 max-w-xs mx-6">
-      
-      </div>
+    
 
       {/* Right — Bell + User */}
       <div className="flex items-center gap-3">
         {/* Notification Bell */}
-        <button className="relative p-2 rounded-full hover:bg-gray-100 transition-colors">
+        <button onClick={()=> navigate('/dashboard/notifications')} className="relative p-2  hover:bg-gray-100 transition-colors cursor-pointer  border-r border-borderColor">
           <Bell size={19} className="text-gray-500" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-purple-500 rounded-full ring-2 ring-white" />
         </button>

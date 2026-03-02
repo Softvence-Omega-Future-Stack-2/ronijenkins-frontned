@@ -13,6 +13,11 @@ import CreateBroadcast from "../Component/globalOverview/CreateBroadcast";
 import UserProfileDetail from "../Component/userManagment/UserDetails";
 import CreateContentForm from "../Component/ContentCms/CreatEditContent";
 import EditContentForm from "../Component/ContentCms/EditContent";
+import NotificationPage from "../pages/NotificationPage";
+import LoginPage from "../auth/Login";
+import ForgotPasswordPage from "../auth/ForgetPassword";
+import OTPVerificationPage from "../auth/VerifyOTP";
+import ResetPasswordPage from "../auth/ResetPassword";
 
 
 
@@ -21,7 +26,22 @@ const routes = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [
-    
+        {
+          path: '/',
+          element:<LoginPage/>
+        },
+        {
+          path: '/forgot-password',
+          element:<ForgotPasswordPage/>
+        },
+        {
+          path: '/otp-verification',
+          element:<OTPVerificationPage/>
+        },
+        {
+          path: '/reset-password',
+          element:<ResetPasswordPage/>
+        },
       {
         path: "dashboard",
         element: <DashboardLayout />,
@@ -38,6 +58,8 @@ const routes = createBrowserRouter([
    
        { path: "ai-logic", element: <AiLogic/> },
        { path: "subscription", element: <Subscription /> },
+       { path: "notifications", element: <NotificationPage/> },
+
       //  { path: "logout", element: <ProfilePage /> },
            
         ],
