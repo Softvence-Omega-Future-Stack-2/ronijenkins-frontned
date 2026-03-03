@@ -105,6 +105,9 @@ export default function UserManagement() {
   const [deletedIds, setDeletedIds] = useState<number[]>([]);
   const navigate = useNavigate()
 
+const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+
   const filtered = users.filter(
     (u) =>
       !deletedIds.includes(u.id) &&
@@ -112,9 +115,22 @@ export default function UserManagement() {
         u.email.toLowerCase().includes(search.toLowerCase()))
   );
 
-  const handleDelete = (id: number) => {
-    setDeletedIds((prev: number[]) => [...prev, id]);
-  };
+const handleDeleteClick = (
+  e: React.MouseEvent<HTMLButtonElement>,
+  id: number
+) => {
+  e.stopPropagation(); // row navigation বন্ধ করবে
+  setSelectedUserId(id);
+  setIsModalOpen(true);
+};
+
+const confirmDelete = () => {
+  if (selectedUserId !== null) {
+    setDeletedIds((prev) => [...prev, selectedUserId]);
+  }
+  setIsModalOpen(false);
+  setSelectedUserId(null);
+};
 
   return (
     <div className="min-h-screen bg-[#f5f0eb] p-4 sm:p-6 lg:p-8 font-sans">
@@ -244,13 +260,40 @@ export default function UserManagement() {
                   {/* Actions */}
                   <td className="px-6 py-4 text-right">
                     <button
-                      onClick={() => handleDelete(user.id)}
-                      className="w-8 h-8 flex items-center justify-center ml-auto text-red-500 cursor-pointer rounded-xl hover:bg-red-50 transition-colors"
+                      onClick={(e) => handleDeleteClick(e, user.id)}
+                      className="w-8 h-8   flex items-center justify-center ml-auto text-red-500 cursor-pointer rounded-xl hover:bg-red-50 transition-colors cursor-pointer"
                       title="Delete user"
                     >
                     <Trash2/>
                     </button>
                   </td>
+                  {isModalOpen && (
+  <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50">
+    <div className="bg-white w-[90%] sm:w-[400px] rounded-2xl p-6 shadow-xl">
+      <h2 className="text-lg font-bold mb-3">Delete User</h2>
+
+      <p className="text-sm mb-6">
+        Are you sure you want to delete this user?
+      </p>
+
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={() => setIsModalOpen(false)}
+          className="px-4 py-2 rounded-xl border"
+        >
+          No
+        </button>
+
+        <button
+          onClick={confirmDelete}
+          className="px-4 py-2 rounded-xl bg-red-500 text-white"
+        >
+          Yes
+        </button>
+      </div>
+    </div>
+  </div>
+)}
                 </tr>
               ))}
 

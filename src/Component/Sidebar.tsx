@@ -1,7 +1,8 @@
-import React, { } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {  Users, LogOut,   FileText } from 'lucide-react';
 import logo from '../../public/img/logo.png'
+import LogoutModal from '../layout/LogoutModal';
 
 interface NavItem {
   id: string;
@@ -78,7 +79,19 @@ const Sidebar: React.FC = () => {
   ];
 
   const isActive = (path: string) => location.pathname === path;
+const [isLogoutOpen, setIsLogoutOpen] = useState(false);
 
+const handleLogoutConfirm = () => {
+
+  
+  console.log("Logged out");
+
+  setIsLogoutOpen(false);
+
+  
+  
+  navigate("/");
+};
   return (
     <div
      
@@ -87,7 +100,7 @@ const Sidebar: React.FC = () => {
       {/* Logo */}
       <div className="px-6 pt-8 pb-6 flex items-center gap-2.5">
        
-        <div>
+        <div onClick={()=> navigate('/dashboard')} className='cursor-pointer'>
           <img src={logo} alt="" />
         </div>
       </div>
@@ -139,9 +152,7 @@ const Sidebar: React.FC = () => {
       {/* Log Out - Fixed at Bottom */}
       <div className="px-3 py-5 border-t border-gray-100">
         <button
-          onClick={() => {
-            /* handle logout */
-          }}
+         onClick={() => setIsLogoutOpen(true)}
           className="w-full flex items-center gap-3 px-4 py-[10px] rounded-xl text-[#E05A5A] hover:bg-red-50 transition-all duration-200 cursor-pointer group"
         >
           <LogOut size={18} className="shrink-0 text-[#E05A5A]" />
@@ -150,6 +161,12 @@ const Sidebar: React.FC = () => {
           </span>
         </button>
       </div>
+      {isLogoutOpen && (
+  <LogoutModal
+    onConfirm={handleLogoutConfirm}
+    onCancel={() => setIsLogoutOpen(false)}
+  />
+)}
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React from "react";
-import DocICon from '../assets/react.svg'
-import DocImgfrom from '../assets/react.svg'
+
+import DocImgfrom from '../../public/img/logo.png'
+
 
 
 interface LogoutModalProps {
@@ -9,6 +10,7 @@ interface LogoutModalProps {
 }
 
 const LogoutModal: React.FC<LogoutModalProps> = ({ onConfirm, onCancel }) => {
+
  
   return (
     <div 
@@ -20,36 +22,37 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ onConfirm, onCancel }) => {
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
       >
         {/* Logo Section */}
-        <div className="flex items-center justify-center mb-6 sm:mb-8">
-          <div className="flex items-center ">
-            <img src={DocImgfrom} alt="Docline Logo" className="h-8 w-8 sm:h-10 sm:w-10"/>
-          <img src={DocICon} alt="" />
+       
+          <div className="flex items-cente justify-center ">
+            <img src={DocImgfrom} alt="Docline Logo" className=""/>
+         
           </div>
-        </div>
+       
 
         {/* Logout Text */}
         <div className="text-center mb-4 sm:mb-6">
           <h2 className="text-2xl sm:text-3xl font-semibold text-[#171C35] mb-2">
-     yhjhyj
+                Logout
           </h2>
           <p className="text-sm sm:text-base text-[#667085]">
-         ghjy
+          Are you sure you want to logout from Navelle?
           </p>
         </div>
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 mt-6 sm:mt-8">
           <button
-            className="flex-1 py-3 px-6 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors cursor-pointer duration-200"
+            className="flex-1 py-3 px-6 bg-white border-2 border-borderColor text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors cursor-pointer duration-200"
+              onClick={onCancel}
+          >
+           Cancel
+          </button>
+          <button
+          
+            className="flex-1 py-3 px-6 bg-buttonColor text-white rounded-xl font-medium  transition-colors cursor-pointer duration-200"
             onClick={onConfirm}
           >
            Yes
-          </button>
-          <button
-            className="flex-1 py-3 px-6 bg-[#526FFF] text-white rounded-xl font-medium hover:bg-blue-700 transition-colors cursor-pointer duration-200"
-            onClick={onCancel}
-          >
-           Cancel
           </button>
         </div>
       </div>
