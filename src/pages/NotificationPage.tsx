@@ -78,7 +78,7 @@ const NotificationPage: React.FC = () => {
   return (
     <div className=" p-4 md:p-8 space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-end">
         <div>
           <h2 className="text-titleColor text-xl sm:text-2xl md:text-[30px] font-extrabold leading-6 md:leading-[36px]">Notifications</h2>
           <p className="text-subTitleColor text-sm font-medium leading-5 mt-0.5">

@@ -1,5 +1,7 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 interface TopicBadge {
   label: string;
@@ -50,12 +52,15 @@ export default function UserProfileDetail() {
 
   const [selectedOption, setSelectedOption] = useState("notify");
 const [reason, setReason] = useState("");
+const navigate = useNavigate();
+
 
   return (
     <div className="min-h-screen bg-[#f5f0eb] p-4 sm:p-6 lg:p-8 font-sans">
 
       {/* Back Nav */}
-      <button className="flex items-center gap-2 text-xs font-bold tracking-widest text-[#7c4d8a] uppercase mb-6 hover:opacity-70 transition-opacity">
+      <button   onClick={() => navigate(-1)}
+       className="flex items-center gap-2 text-xs font-bold tracking-widest text-[#7c4d8a] uppercase mb-6 hover:opacity-70 transition-opacity cursor-pointer">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
