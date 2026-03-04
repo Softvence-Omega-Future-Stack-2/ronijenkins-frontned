@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import profile from '../../public/img/adminProfile.png'
 import ChangePasswordDemo from "../Component/profile/ChangePasswordModal";
+import AddressInformation from "../Component/profile/AddressInfo";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 const UploadIcon = () => (
@@ -47,15 +48,7 @@ const LockIcon = () => (
   </svg>
 );
 
-const DotIcon = ({ color }: { color: string }) => (
-  <span
-    className="inline-block w-2 h-2 rounded-full flex-shrink-0"
-    style={{
-      background: color,
-      boxShadow: `0 0 0 3px ${color}26`,
-    }}
-  />
-);
+
 
 // ─── Section 1: Page Title ────────────────────────────────────────────────────
 const PageTitle = () => (
@@ -203,8 +196,8 @@ const BasicInfoSection = () => {
 
 // ─── Section 4: Security & Password ──────────────────────────────────────────
 const SecuritySection = () => {
-  const [twoFA, setTwoFA] = useState(true);
-  const [loginNotif, setLoginNotif] = useState(true);
+ 
+
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   return (
@@ -218,23 +211,7 @@ const SecuritySection = () => {
       </div>
 
       <div className="divide-y divide-gray-50">
-        {/* Two-Factor Auth */}
-        <div className="flex items-start sm:items-center justify-between py-4 gap-3">
-          <div>
-            <p className="text-xs text-subTitleColor uppercase tracking-[1.5px] font-black leading-5 mb-0.5">
-              Two-Factor Authentication
-            </p>
-            <p className="text-titleColor font-medium leading-5">Add an extra layer of security to your account</p>
-          </div>
-          <button
-            onClick={() => setTwoFA(!twoFA)}
-            className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest flex-shrink-0 transition-all"
-            style={{ color: twoFA ? "#22c55e" : "#9ca3af" }}
-          >
-            <DotIcon color={twoFA ? "#22c55e" : "#9ca3af"} />
-            {twoFA ? "Enabled" : "Disabled"}
-          </button>
-        </div>
+ 
 
         {/* Last Password Change */}
         <div className="flex items-start sm:items-center justify-between py-4 gap-3">
@@ -249,23 +226,7 @@ const SecuritySection = () => {
           </button>
         </div>
 
-        {/* Login Notifications */}
-        <div className="flex items-start sm:items-center justify-between py-4 gap-3">
-          <div>
-            <p className="text-xs text-subTitleColor uppercase tracking-[1.5px] font-black leading-5 mb-0.5">
-              Login Notifications
-            </p>
-            <p className="text-sm text-titleColor font-medium leading-5 ">Get notified when someone logs into your account</p>
-          </div>
-          <button
-            onClick={() => setLoginNotif(!loginNotif)}
-            className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest flex-shrink-0 transition-all"
-            style={{ color: loginNotif ? "#22c55e" : "#9ca3af" }}
-          >
-            <DotIcon color={loginNotif ? "#22c55e" : "#9ca3af"} />
-            {loginNotif ? "Enabled" : "Disabled"}
-          </button>
-        </div>
+    
       </div>
       {isPasswordModalOpen && (
   <ChangePasswordDemo
@@ -327,6 +288,7 @@ export default function EditProfile() {
 
         {/* Section 3: Basic Info */}
         <BasicInfoSection />
+        <AddressInformation/>
 
         {/* Section 4: Security */}
         <SecuritySection />
