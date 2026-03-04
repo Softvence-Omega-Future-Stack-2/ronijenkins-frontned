@@ -1,20 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+
 import type { MeditationStep } from './contentStore';
 
 
-// ─────────────────────────────────────────────
-// RICH TEXT EDITOR (Article)
-// ─────────────────────────────────────────────
+
 interface RichTextEditorProps {
-  initialValue?: string; // ✅ edit এ existing HTML load করবে
+  initialValue?: string; // 
   onChange?: (html: string) => void;
 }
 
 export const RichTextEditor: React.FC<RichTextEditorProps> = ({ initialValue = '', onChange }) => {
   const editorRef = useRef<HTMLDivElement>(null);
 
-  // ✅ Edit এ existing content load
+
   useEffect(() => {
     if (editorRef.current && initialValue) {
       editorRef.current.innerHTML = initialValue;
@@ -65,7 +63,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ initialValue = '
         ))}
         {/* Image embed */}
         <label className="px-2.5 py-1.5 text-xs rounded-lg hover:bg-[#ECC3B44D] text-[#4A3A37] transition-colors cursor-pointer" title="Embed Image">
-          🖼️
+          
           <input type="file" accept="image/*" className="hidden" onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) exec('insertImage', URL.createObjectURL(file));
@@ -98,11 +96,9 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({ initialValue = '
   );
 };
 
-// ─────────────────────────────────────────────
-// VIDEO UPLOAD
-// ─────────────────────────────────────────────
+
 interface VideoUploadProps {
-  initialVideoUrl?: string;       // ✅ edit এ existing video
+  initialVideoUrl?: string;       
   initialVideoName?: string;
   initialVideoSize?: number;
   onVideoChange: (file: File | null, url: string | null) => void;
@@ -177,9 +173,7 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({
   );
 };
 
-// ─────────────────────────────────────────────
-// MEDITATION EDITOR
-// ─────────────────────────────────────────────
+
 interface MeditationEditorProps {
   initialSteps?: MeditationStep[];
   initialAudioUrl?: string;
@@ -205,35 +199,35 @@ export const MeditationEditor: React.FC<MeditationEditorProps> = ({
   initialBgMusicName,
   onChange,
 }) => {
-  const [steps, setSteps] = useState<MeditationStep[]>(initialSteps);
+  const [steps, ] = useState<MeditationStep[]>(initialSteps);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(initialAudioUrl || null);
   const [audioFileName, setAudioFileName] = useState<string | null>(initialAudioName || null);
-  const [bgMusicFile, setBgMusicFile] = useState<File | null>(null);
-  const [bgMusicUrl, setBgMusicUrl] = useState<string | null>(initialBgMusicUrl || null);
-  const [bgMusicFileName, setBgMusicFileName] = useState<string | null>(initialBgMusicName || null);
+  const [bgMusicFile, ] = useState<File | null>(null);
+  const [bgMusicUrl, ] = useState<string | null>(initialBgMusicUrl || null);
+  const [bgMusicFileName, ] = useState<string | null>(initialBgMusicName || null);
 
   const notify = (newSteps = steps, newAudioFile = audioFile, newAudioUrl = audioUrl, newAudioFileName = audioFileName, newBgFile = bgMusicFile, newBgUrl = bgMusicUrl, newBgName = bgMusicFileName) => {
     onChange?.({ steps: newSteps, audioFile: newAudioFile, audioUrl: newAudioUrl, audioFileName: newAudioFileName, bgMusicFile: newBgFile, bgMusicUrl: newBgUrl, bgMusicFileName: newBgName });
   };
 
-  const addStep = () => {
-    const updated = [...steps, { id: Date.now(), instruction: '', duration: 30 }];
-    setSteps(updated);
-    notify(updated);
-  };
+  // const addStep = () => {
+  //   const updated = [...steps, { id: Date.now(), instruction: '', duration: 30 }];
+  //   setSteps(updated);
+  //   notify(updated);
+  // };
 
-  const removeStep = (id: number) => {
-    const updated = steps.filter(s => s.id !== id);
-    setSteps(updated);
-    notify(updated);
-  };
+  // const removeStep = (id: number) => {
+  //   const updated = steps.filter(s => s.id !== id);
+  //   setSteps(updated);
+  //   notify(updated);
+  // };
 
-  const updateStep = (id: number, field: keyof MeditationStep, value: string | number) => {
-    const updated = steps.map(s => s.id === id ? { ...s, [field]: value } : s);
-    setSteps(updated);
-    notify(updated);
-  };
+  // const updateStep = (id: number, field: keyof MeditationStep, value: string | number) => {
+  //   const updated = steps.map(s => s.id === id ? { ...s, [field]: value } : s);
+  //   setSteps(updated);
+  //   notify(updated);
+  // };
 
   const handleAudio = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -244,16 +238,16 @@ export const MeditationEditor: React.FC<MeditationEditorProps> = ({
     }
   };
 
-  const handleBgMusic = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setBgMusicFile(file); setBgMusicUrl(url); setBgMusicFileName(file.name);
-      notify(steps, audioFile, audioUrl, audioFileName, file, url, file.name);
-    }
-  };
+  // const handleBgMusic = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     const url = URL.createObjectURL(file);
+  //     setBgMusicFile(file); setBgMusicUrl(url); setBgMusicFileName(file.name);
+  //     notify(steps, audioFile, audioUrl, audioFileName, file, url, file.name);
+  //   }
+  // };
 
-  const totalSeconds = steps.reduce((a, s) => a + s.duration, 0);
+  // const totalSeconds = steps.reduce((a, s) => a + s.duration, 0);
 
   return (
     <div className="space-y-6">
@@ -279,12 +273,12 @@ export const MeditationEditor: React.FC<MeditationEditorProps> = ({
             </div>
             <input type="file" accept="audio/*" className="hidden" onChange={handleAudio} />
           </label>
-          {/* ✅ Audio preview if existing */}
+          {/* Audio preview if existing */}
           {audioUrl && <audio src={audioUrl} controls className="w-full mt-1 h-8" />}
         </div>
 
         {/* BG Music */}
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <label className="text-[10px] font-extrabold tracking-[2px] text-subTitleColor uppercase block">
             Background Music <span className="text-gray-300 normal-case tracking-normal font-normal">(optional)</span>
           </label>
@@ -304,11 +298,11 @@ export const MeditationEditor: React.FC<MeditationEditorProps> = ({
             <input type="file" accept="audio/*" className="hidden" onChange={handleBgMusic} />
           </label>
           {bgMusicUrl && <audio src={bgMusicUrl} controls className="w-full mt-1 h-8" />}
-        </div>
+        </div> */}
       </div>
 
       {/* Steps */}
-      <div className="space-y-3">
+      {/* <div className="space-y-3">
         <div className="flex items-center justify-between">
           <label className="text-[10px] font-extrabold tracking-[2px] text-subTitleColor uppercase">Meditation Steps</label>
           <span className="text-[10px] text-gray-400">Total: {totalSeconds}s ({Math.ceil(totalSeconds / 60)} min)</span>
@@ -344,7 +338,7 @@ export const MeditationEditor: React.FC<MeditationEditorProps> = ({
         <button onClick={addStep} className="w-full flex items-center justify-center gap-2 border border-dashed border-borderColor rounded-2xl py-3 text-[10px] font-extrabold tracking-[2px] text-subTitleColor uppercase hover:bg-[#FAF7F5] transition-colors cursor-pointer">
           <Plus size={12} /> Add Step
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

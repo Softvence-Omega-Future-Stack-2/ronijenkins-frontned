@@ -1,42 +1,12 @@
 import { useState } from "react";
 import profile from '../../public/img/adminProfile.png'
 import { useNavigate } from "react-router-dom";
+import AddressInformation from "../Component/profile/AddressInfo";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-interface StatCard {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  trend?: string;
-  trendUp?: boolean;
-}
 
-interface Permission {
-  name: string;
-  granted: boolean;
-}
 
-// ─── Icons (inline SVG components) ───────────────────────────────────────────
-const ClockIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10" />
-    <polyline points="12 6 12 12 16 14" />
-  </svg>
-);
 
-const GearIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="3" />
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-  </svg>
-);
 
-const UserIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-    <circle cx="12" cy="7" r="4" />
-  </svg>
-);
 
 const MailIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -64,14 +34,9 @@ const LocationIcon = () => (
   </svg>
 );
 
-const ArrowUpIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="12" y1="19" x2="12" y2="5" />
-    <polyline points="5 12 12 5 19 12" />
-  </svg>
-);
 
-// ─── Section 1: Profile Header ────────────────────────────────────────────────
+
+
 const ProfileHeader = () => {
   const [, setEditHovered] = useState(false);
 const navigate = useNavigate()
@@ -145,183 +110,21 @@ const navigate = useNavigate()
   );
 };
 
-// ─── Section 2: Stats Cards ───────────────────────────────────────────────────
-const StatsSection = () => {
-  const stats: StatCard[] = [
-    {
-      icon: <ClockIcon />,
-      label: "Active Sessions",
-      value: "42",
-      trend: "+6.2%",
-      trendUp: true,
-    },
-    {
-      icon: <GearIcon />,
-      label: "Total Actions",
-      value: "1,245",
-      trend: "+12.5%",
-      trendUp: true,
-    },
-    {
-      icon: <UserIcon />,
-      label: "Last Login",
-      value: "Today",
-      trend: "10:24 AM",
-      trendUp: undefined,
-    },
-  ];
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      {stats.map((stat, i) => (
-        <StatCard key={i} stat={stat} />
-      ))}
-    </div>
-  );
-};
-
-const StatCard = ({ stat }: { stat: StatCard }) => {
-  const [hovered, setHovered] = useState(false);
-
-//   const iconColors = [
-//     { bg: "bg-orange-50", text: "text-orange-400" },
-//     { bg: "bg-green-50", text: "text-green-500" },
-//     { bg: "bg-blue-50", text: "text-blue-400" },
-//   ];
-
-  return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="bg-white rounded-2xl md:rounded-4xl border border-borderColor  p-5 md:p-8 transition-all duration-200 cursor-default"
-      style={{
-        boxShadow: hovered
-          ? "0 8px 30px rgba(0,0,0,0.08)"
-          : "0 1px 4px rgba(0,0,0,0.04)",
-        transform: hovered ? "translateY(-2px)" : "translateY(0)",
-      }}
-    >
-      <div className="flex items-start justify-between mb-3">
-        <div
-          className={`p-2 rounded-xl ${
-            stat.label === "Active Sessions"
-              ? "bg-[#9266901A] text-buttonColor"
-              : stat.label === "Total Actions"
-              ? "bg-green-50 text-green-500"
-              : "bg-blue-50 text-blue-400"
-          }`}
-        >
-          {stat.icon}
-        </div>
-
-        {stat.trendUp !== undefined ? (
-          <span className="flex items-center gap-0.5 text-xs font-semibold text-green-500 bg-green-50 px-2 py-0.5 rounded-full">
-            <ArrowUpIcon />
-            {stat.trend}
-          </span>
-        ) : (
-          <span className="text-xs text-gray-400 font-medium">{stat.trend}</span>
-        )}
-      </div>
-
-      <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">
-        {stat.label}
-      </p>
-      <p className="text-3xl font-bold text-gray-900 tracking-tight">{stat.value}</p>
-    </div>
-  );
-};
-
-// ─── Section 3: Permissions & Access ─────────────────────────────────────────
-const PermissionsSection = () => {
-  const permissions: Permission[] = [
-    { name: "User Management", granted: true },
-    { name: "Content CMS", granted: true },
-    { name: "Mennie™ AI Logic", granted: true },
-    { name: "Subscriptions", granted: true },
-    { name: "System Settings", granted: true },
-    { name: "Analytics Dashboard", granted: true },
-    { name: "Broadcast Updates", granted: true },
-    { name: "Data Export", granted: true },
-  ];
-
-  return (
-    <div className="bg-white rounded-2xl md:rounded-4xl border border-borderColor shadow-sm p-5 sm:p-6">
-      <h2 className="text-base md:texxt-xl font-black text-titleColor leading-7 mb-4 tracking-tight mb-5">
-        Permissions &amp; Access
-      </h2>
-
-      <div className="divide-y divide-gray-50">
-        {permissions.map((perm, i) => (
-          <PermissionRow key={i} permission={perm} index={i} />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const PermissionRow = ({
-  permission,
-  
-}: {
-  permission: Permission;
-  index: number;
-}) => {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="flex items-center justify-between py-3 transition-all duration-150 rounded-lg px-2 -mx-2"
-      style={{
-        background: hovered ? "#f9fafb" : "transparent",
-      }}
-    >
-      <span className="text-sm text-titleColor leading-5 font-medium">{permission.name}</span>
-
-      <div className="flex items-center gap-2">
-        {/* Animated dot */}
-        <span
-          className="inline-block w-2 h-2 rounded-full"
-          style={{
-            background: permission.granted ? "#22c55e" : "#ef4444",
-            boxShadow: permission.granted
-              ? "0 0 0 3px rgba(34,197,94,0.15)"
-              : "0 0 0 3px rgba(239,68,68,0.15)",
-          }}
-        />
-        <span
-          className="text-xs font-black leading-5 uppercase tracking-widest"
-          style={{ color: permission.granted ? "#22c55e" : "#ef4444" }}
-        >
-          {permission.granted ? "Granted" : "Denied"}
-        </span>
-      </div>
-    </div>
-  );
-};
 
 
-// ─── Root Component ───────────────────────────────────────────────────────────
 export default function AdminProfile() {
   return (
     <div
       className="min-h-screen p-4 md:p-6"
     
     >
-      {/* Google Font import */}
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');`}</style>
+
 
       <div className=" space-y-4">
         {/* Section 1 */}
         <ProfileHeader />
-
-        {/* Section 2 */}
-        <StatsSection />
-
-        {/* Section 3 */}
-        <PermissionsSection />
+       <AddressInformation/>
+    
 
       </div>
     </div>
