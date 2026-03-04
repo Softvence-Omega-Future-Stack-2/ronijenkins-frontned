@@ -157,7 +157,7 @@ const confirmDelete = () => {
           </div>
 
           {/* Filter */}
-          <button className="w-10 h-10 flex items-center justify-center bg-white border border-gray-100 rounded-full shadow-sm hover:bg-gray-50 transition-colors flex-shrink-0 cursor-pointer">
+          {/* <button className="w-10 h-10 flex items-center justify-center bg-white border border-gray-100 rounded-full shadow-sm hover:bg-gray-50 transition-colors flex-shrink-0 cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
   <g clip-path="url(#clip0_211_8928)">
     <path d="M8.33206 16.6634C8.33198 16.8182 8.37505 16.97 8.45644 17.1017C8.53782 17.2335 8.6543 17.3399 8.7928 17.4091L10.4591 18.2423C10.5862 18.3058 10.7274 18.3357 10.8693 18.3293C11.0112 18.3229 11.149 18.2803 11.2698 18.2055C11.3906 18.1308 11.4903 18.0265 11.5594 17.9024C11.6286 17.7783 11.6648 17.6386 11.6647 17.4966V11.6644C11.6649 11.2515 11.8184 10.8533 12.0955 10.5471L18.1135 3.89091C18.2213 3.7714 18.2923 3.62319 18.3177 3.46423C18.3431 3.30526 18.3219 3.14233 18.2567 2.99514C18.1915 2.84796 18.085 2.72282 17.9502 2.63486C17.8153 2.5469 17.6579 2.49989 17.4969 2.49951H2.49986C2.33873 2.49957 2.18108 2.54635 2.04599 2.63418C1.91091 2.72202 1.80419 2.84713 1.73876 2.99438C1.67334 3.14163 1.65202 3.30469 1.67738 3.46382C1.70274 3.62294 1.77369 3.77129 1.88165 3.89091L7.90131 10.5471C8.17837 10.8533 8.33187 11.2515 8.33206 11.6644V16.6634Z" stroke="#4A3A37" stroke-width="1.66634" stroke-linecap="round" stroke-linejoin="round"/>
@@ -168,7 +168,7 @@ const confirmDelete = () => {
     </clipPath>
   </defs>
 </svg>
-          </button>
+          </button> */}
 
    
         </div>

@@ -51,7 +51,7 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
         </button>
 
         {/* User Avatar + Info */}
-        <div className="flex items-center border border-borderColor bg-[#FAF7F5] rounded-2xl py-1 px-4 gap-2.5 cursor-pointer group">
+        <div onClick={()=> navigate('/dashboard/profile')} className="flex items-center border border-borderColor bg-[#FAF7F5] rounded-2xl py-1 px-4 gap-2.5 cursor-pointer group">
           <div className="relative flex-shrink-0">
             <img src={profileImg} alt="" />
             
