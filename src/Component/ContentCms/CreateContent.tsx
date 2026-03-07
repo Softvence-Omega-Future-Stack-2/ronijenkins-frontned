@@ -37,7 +37,7 @@ const CreateContentForm: React.FC = () => {
   // Dropdowns
   const [typeOpen, setTypeOpen] = useState(false);
   const [typeSelected, setTypeSelected] = useState('Article');
-  const typeOptions = ['Article', 'Video', 'Meditation'];
+  const typeOptions = ['Article', 'Video', 'Audio'];
 
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [categorySelected, setCategorySelected] = useState('Symptom Relief');
@@ -63,11 +63,11 @@ const CreateContentForm: React.FC = () => {
       videoFileName: typeSelected === 'Video' ? (videoFileName || undefined) : undefined,
       videoFileSize: typeSelected === 'Video' ? (videoFileSize || undefined) : undefined,
       // Meditation
-      meditationSteps: typeSelected === 'Meditation' ? meditationData.steps : undefined,
-      audioUrl: typeSelected === 'Meditation' ? (meditationData.audioUrl || undefined) : undefined,
-      audioFileName: typeSelected === 'Meditation' ? (meditationData.audioFileName || undefined) : undefined,
-      bgMusicUrl: typeSelected === 'Meditation' ? (meditationData.bgMusicUrl || undefined) : undefined,
-      bgMusicFileName: typeSelected === 'Meditation' ? (meditationData.bgMusicFileName || undefined) : undefined,
+      meditationSteps: typeSelected === 'Audio' ? meditationData.steps : undefined,
+      audioUrl: typeSelected === 'Audio' ? (meditationData.audioUrl || undefined) : undefined,
+      audioFileName: typeSelected === 'Audio' ? (meditationData.audioFileName || undefined) : undefined,
+      bgMusicUrl: typeSelected === 'Audio' ? (meditationData.bgMusicUrl || undefined) : undefined,
+      bgMusicFileName: typeSelected === 'Audio' ? (meditationData.bgMusicFileName || undefined) : undefined,
     });
 
     navigate(-1);
@@ -193,7 +193,7 @@ const CreateContentForm: React.FC = () => {
             </div>
           )}
 
-          {typeSelected === 'Meditation' && (
+          {typeSelected === 'Audio' && (
             <div className="space-y-3">
               <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase block">Meditation Content</label>
               <MeditationEditor

@@ -5,20 +5,20 @@ import { useContentStore, contentStore, type ContentType, type ContentItem,
   
  } from "./contentStore";
 
-type TabKey = "all" | "articles" | "video-guides" | "meditation";
+type TabKey = "all" | "articles" | "video-guides" | "audio";
 
 const tabs: { key: TabKey; label: string }[] = [
   { key: "all", label: "ALL CONTENT" },
   { key: "articles", label: "ARTICLES" },
   { key: "video-guides", label: "VIDEO GUIDES" },
-  { key: "meditation", label: "MEDITATION" },
+  { key: "audio", label: "AUDIO" },
 ];
 
 const filterMap: Record<TabKey, ContentType[]> = {
-  all: ["article", "video", "meditation"],
+  all: ["article", "video", "audio"],
   articles: ["article"],
   "video-guides": ["video"],
-  meditation: ["meditation"],
+  audio: ["audio"],
 };
 
 function ContentCard({ item }: { item: ContentItem }) {
@@ -31,11 +31,11 @@ function ContentCard({ item }: { item: ContentItem }) {
       <div className="flex justify-between items-start">
         <div
           className={`w-10 h-10 rounded-lg flex items-center justify-center p-2
-            ${item.type === "video" || item.type === "meditation"
+            ${item.type === "video" || item.type === "audio"
               ? "bg-[#FAF5FF] border border-[#F3E8FF]"
               : "bg-[#EFF6FF] border border-[#DBEAFE]"}`}
         >
-          {item.type === "video" || item.type === "meditation" ? (
+          {item.type === "video" || item.type === "audio" ? (
             <Video size={20} className="text-[#9810FA]" />
           ) : (
             <FileText size={20} className="text-[#155DFC]" />
@@ -231,8 +231,8 @@ export default function ContentCMS() {
 // import { useNavigate } from "react-router-dom";
 
 // type ContentStatus = "PUBLISHED" | "DRAFT";
-// type ContentType = "article" | "video" | "meditation";
-// type TabKey = "all" | "articles" | "video-guides" | "meditation";
+// type ContentType = "article" | "video" | "audio";
+// type TabKey = "all" | "articles" | "video-guides" | "audio";
 
 // interface ContentItem {
 //   id: number;
@@ -258,10 +258,10 @@ export default function ContentCMS() {
 //   },
 //   {
 //     id: 2,
-//     title: "10-Minute Evening Meditation",
+//     title: "10-Minute Evening audio",
 //     category: "MENTAL HEALTH",
 //     status: "PUBLISHED",
-//     type: "meditation",
+//     type: "audio",
 //     views: "8.2k",
 //     date: "Feb 10, 2026",
 //   },
@@ -307,14 +307,14 @@ export default function ContentCMS() {
 //   { key: "all", label: "ALL CONTENT" },
 //   { key: "articles", label: "ARTICLES" },
 //   { key: "video-guides", label: "VIDEO GUIDES" },
-//   { key: "meditation", label: "MEDITATION" },
+//   { key: "audio", label: "audio" },
 // ];
 
 // const filterMap: Record<TabKey, ContentType[]> = {
-//   all: ["article", "video", "meditation"],
+//   all: ["article", "video", "audio"],
 //   articles: ["article"],
 //   "video-guides": ["video"],
-//   meditation: ["meditation"],
+//   audio: ["audio"],
 // };
 
 // function ContentCard({ item }: { item: ContentItem }) {
@@ -327,12 +327,12 @@ export default function ContentCMS() {
 //     <div
 //   className={`
 //     w-10 h-10 rounded-lg flex items-center justify-center p-2
-//     ${item.type === "video" || item.type === "meditation" 
+//     ${item.type === "video" || item.type === "audio" 
 //         ? "bg-[#FAF5FF] border border-[#F3E8FF]" 
 //         : "bg-[#EFF6FF] border border-[#DBEAFE]"}
 //   `}
 // >
-//   {item.type === "video" || item.type === "meditation" ? (
+//   {item.type === "video" || item.type === "audio" ? (
 //     <Video size={20} className="text-[#9810FA]" />
 //   ) : (
 //     <FileText size={20} className="text-[#155DFC]" />
