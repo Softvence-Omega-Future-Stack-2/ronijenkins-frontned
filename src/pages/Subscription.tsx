@@ -16,7 +16,7 @@ const Subscription = () => {
           <div>
             <SubscriptionCard/>
           </div>
-       
+         
    
           <div>
       {/* Tabs */}
@@ -58,6 +58,7 @@ const Subscription = () => {
           </div>
    
     </div>
+    
   )
 }
 

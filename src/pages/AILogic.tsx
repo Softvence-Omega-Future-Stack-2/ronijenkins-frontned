@@ -7,6 +7,7 @@ import RecentQueries from "./RecentQuries"
 
 const AiLogic= () => {
   return (
+    
     <div className="w-full p-3 md:p-8 ">
       
       <h1 className="text-titleColor text-xl sm:text-2xl md:text-[30px] font-extrabold leading-6 md:leading-[36px]">Mennie™ AI Logic</h1>
@@ -19,6 +20,8 @@ const AiLogic= () => {
               <InferenceLoad/>
             </div>
           </div> */}
+            
+
 
             <div className="flex flex-col xl:flex-row  items-stretch w-full gap-7 mt-6 ">
         <div className="w-full xl:w-1/2">
@@ -29,6 +32,7 @@ const AiLogic= () => {
             </div>
           </div>
     </div>
+    
   )
 }
 
