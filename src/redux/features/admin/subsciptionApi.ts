@@ -32,7 +32,7 @@ export const subscriptionApi = baseAPI.injectEndpoints({
         url: "/subscriptions/list/",
         method: "GET",
       }),
-      providesTags: ["Subscription"],
+      // providesTags: ["Subscription"],
     }),
 
 
@@ -45,7 +45,7 @@ export const subscriptionApi = baseAPI.injectEndpoints({
         method: "PUT",
         body: { price_id, price },
       }),
-      invalidatesTags: ["Subscription"],
+      // invalidatesTags: ["Subscription"],
     }),
 
 
@@ -54,7 +54,7 @@ export const subscriptionApi = baseAPI.injectEndpoints({
         url: "/subscriptions/toggle-free-tier/",
         method: "PUT",
       }),
-      invalidatesTags: ["Subscription"],
+      // invalidatesTags: ["Subscription"],
     }),
 
   }),

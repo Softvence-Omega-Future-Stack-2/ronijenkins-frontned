@@ -36,27 +36,27 @@ const LoginPage: React.FC = () => {
       console.log("Login Response:", res);
 
       //  Token safe extraction
-      const accessToken = res?.access || res?.data?.accessToken;
-      const refreshToken = res?.refresh || res?.data?.refreshToken;
+// const accessToken = res?.data?.login?.accessToken;
 
-      if (!accessToken) {
-        toast.update(toastId, {
-          render: "Invalid token received ",
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-        });
-        return;
-      }
 
-      //  Save to Redux + localStorage
-      dispatch(
-        setCredentials({
-          user: res?.user || res?.data?.user || null,
-          token: accessToken,
-          refreshToken: refreshToken,
-        })
-      );
+//       if (!accessToken) {
+//         toast.update(toastId, {
+//           render: "Invalid token received ",
+//           type: "error",
+//           isLoading: false,
+//           autoClose: 3000,
+//         });
+//         return;
+//       }
+
+//       //  Save to Redux + localStorage
+//  dispatch(
+//   setCredentials({
+//     user: null,
+//     token: accessToken,
+//     refreshToken: null,
+//   })
+// );
 
       // Success Toast
       toast.update(toastId, {
