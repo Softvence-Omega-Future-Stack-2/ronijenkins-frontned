@@ -3,11 +3,21 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../store';
 import { setCredentials, logout } from '../features/auth/authSlice';
 
+// Helper to get a cookie by name
+const getCookie = (name: string) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift();
+  return null;
+};
+
 const baseQueryAPI = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_API_URL || 'https://ronijenkinsserver-production.up.railway.app/graphql',
+  baseUrl: '/graphql',
+  credentials: 'include',
   prepareHeaders: (headers, { getState, endpoint }) => {
     const state = getState() as RootState;
-    let token = state.auth.token;
+    // Prioritize cookie over Redux state
+    let token = getCookie("access_token") || getCookie("accessToken") || getCookie("token") || state.auth.token;
 
     if (!token || token === 'undefined') token = null;
 
@@ -17,7 +27,7 @@ const baseQueryAPI = fetchBaseQuery({
 
     const isPublic = publicEndpoints.some(e => endpoint?.toLowerCase().includes(e.toLowerCase()));
 
-    if (token && !isPublic) headers.set('Authorization', `Bearer ${token}`);
+    if (token && !isPublic) headers.set('Authorization', `${token}`);
 
     return headers;
   },
@@ -47,7 +57,7 @@ const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
 
         const retryArgs = typeof args === 'string' ? args : {
           ...args,
-          headers: { ...(args.headers || {}), Authorization: `Bearer ${newToken}` },
+          headers: { ...(args.headers || {}), Authorization: `${newToken}` },
         };
         result = await baseQueryAPI(retryArgs, api, extraOptions);
       } else { api.dispatch(logout()); window.location.href = '/login';

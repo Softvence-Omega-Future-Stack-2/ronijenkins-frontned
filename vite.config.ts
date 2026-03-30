@@ -8,6 +8,14 @@ export default defineConfig({
     tailwindcss()
   ],
   server: {
-    port: 3000
+    port: 3000,
+    proxy: {
+      '/graphql': {
+        // target: 'https://ronijenkinsserver-production.up.railway.app',
+        target: 'http://localhost:8989',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
   }
 })

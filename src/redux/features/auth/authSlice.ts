@@ -5,12 +5,14 @@ interface AuthState {
   user: any;
   token: string | null;
   refreshToken: string | null;
+  isAuthenticated: boolean;
 }
 
 const initialState: AuthState = {
   user: null,
   token: localStorage.getItem("token"),
   refreshToken: localStorage.getItem("refreshToken"),
+  isAuthenticated: !!localStorage.getItem("isLoggedIn"),
 };
 
 const authSlice = createSlice({
@@ -20,14 +22,16 @@ const authSlice = createSlice({
     setCredentials: (state, action) => {
       const { user, token, refreshToken } = action.payload;
 
-      if (!token || token === "undefined") return;
-
       state.user = user;
-      state.token = token;
-      state.refreshToken = refreshToken;
+      state.token = token || state.token;
+      state.refreshToken = refreshToken || state.refreshToken;
+      state.isAuthenticated = true;
+      localStorage.setItem("isLoggedIn", "true");
 
-      localStorage.setItem("token", token);
-      if (refreshToken) {
+      if (token && token !== "undefined") {
+        localStorage.setItem("token", token);
+      }
+      if (refreshToken && refreshToken !== "undefined") {
         localStorage.setItem("refreshToken", refreshToken);
       }
     },
@@ -36,9 +40,11 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.refreshToken = null;
+      state.isAuthenticated = false;
 
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
+      localStorage.removeItem("isLoggedIn");
     },
   },
 });
