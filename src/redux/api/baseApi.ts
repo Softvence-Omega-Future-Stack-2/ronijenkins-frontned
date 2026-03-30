@@ -4,7 +4,7 @@ import type { RootState } from '../store';
 import { setCredentials, logout } from '../features/auth/authSlice';
 
 const baseQueryAPI = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_API_URL || 'https://your-new-api.com/api/v1',
+  baseUrl: import.meta.env.VITE_API_URL || 'https://ronijenkinsserver-production.up.railway.app/graphql',
   prepareHeaders: (headers, { getState, endpoint }) => {
     const state = getState() as RootState;
     let token = state.auth.token;
@@ -50,9 +50,7 @@ const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
           headers: { ...(args.headers || {}), Authorization: `Bearer ${newToken}` },
         };
         result = await baseQueryAPI(retryArgs, api, extraOptions);
-      } else {
-        api.dispatch(logout());
-        window.location.href = '/login';
+      } else { api.dispatch(logout()); window.location.href = '/login';
       }
     } else {
       api.dispatch(logout());

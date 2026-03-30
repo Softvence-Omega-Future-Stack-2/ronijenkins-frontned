@@ -14,7 +14,7 @@ export const platformSettingsApi = baseAPI.injectEndpoints({
     // GET platform settings
     getPlatformSettings: builder.query<PlatformSettings, void>({
       query: () => '/admin/platform-settings/',
-      providesTags: ['PlatformSettings'],
+      // providesTags: ['PlatformSettings'],
     }),
 
     // PATCH update platform settings
@@ -27,7 +27,7 @@ updatePlatformSettings: builder.mutation<
     method: 'PATCH',
     body: data,
   }),
-  invalidatesTags: ['PlatformSettings'],
+  // invalidatesTags: ['PlatformSettings'],
 }),
 
   }),
