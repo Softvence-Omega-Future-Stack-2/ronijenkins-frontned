@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import {  Users, LogOut,   FileText } from 'lucide-react';
-import logo from '../../public/img/logo.png'
-import LogoutModal from '../layout/LogoutModal';
+import { useMutation } from "@apollo/client/react";
+import { LOGOUT_MUTATION } from "../graphql/operations";
+import { logout as clearLogout } from "../redux/features/auth/authSlice";
+import { useDispatch } from "react-redux";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Users, FileText, LogOut } from "lucide-react";
+import logo from "../../public/img/logo.png";
+import LogoutModal from "../layout/LogoutModal";
 
 interface NavItem {
   id: string;
@@ -43,7 +47,8 @@ const SubscriptionsIcon = () => (
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
- 
+  const dispatch = useDispatch();
+  const [logoutMutation] = useMutation(LOGOUT_MUTATION);
 
   const menuItems: NavItem[] = [
     {
@@ -53,10 +58,10 @@ const Sidebar: React.FC = () => {
       path: '/dashboard',
     },
     {
-      id: 'users',
-      label: 'User Management',
+      id: "users",
+      label: "User Management",
       icon: <Users size={19} />,
-      path: '/dashboard/users-managment',
+      path: "/dashboard/users-managment",
     },
     {
       id: 'content',
@@ -79,19 +84,20 @@ const Sidebar: React.FC = () => {
   ];
 
   const isActive = (path: string) => location.pathname === path;
-const [isLogoutOpen, setIsLogoutOpen] = useState(false);
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
 
-const handleLogoutConfirm = () => {
-
-  
-  console.log("Logged out");
-
-  setIsLogoutOpen(false);
-
-  
-  
-  navigate("/");
-};
+  const handleLogoutConfirm = async () => {
+    try {
+      await logoutMutation();
+      dispatch(clearLogout());
+      setIsLogoutOpen(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+      dispatch(clearLogout()); // Force logout anyway
+      navigate("/");
+    }
+  };
   return (
     <div
      
