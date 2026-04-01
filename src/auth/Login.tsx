@@ -1,83 +1,81 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthLayout from './AuthLayout';
-
 import { useDispatch } from 'react-redux';
 import { useLoginMutation } from '../redux/features/auth/authAPi';
 import { setCredentials } from '../redux/features/auth/authSlice';
-
 import { toast } from 'react-toastify';
 
 const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const [login, { isLoading }] = useLoginMutation();
 
-  // LOGIN FUNCTION
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    //  Validation
     if (!email || !password) {
-      toast.error("Please fill all fields",{position:"top-right"});
+      toast.error("Please fill all fields", { position: "top-right" });
       return;
     }
 
-    const toastId = toast.loading("Signing in..." , {position:'top-right'});
+    const toastId = toast.loading("Signing in...", { position: 'top-right' });
 
     try {
       const res: any = await login({ email, password }).unwrap();
-
       console.log("Login Response:", res);
 
-      //  Token safe extraction
-// const accessToken = res?.data?.login?.accessToken;
+      // ✅ Token extract — your API returns { data: { accessToken, refreshToken } }
+   const rawToken = res?.data?.accessToken;
+const rawRefresh = res?.data?.refreshToken;
 
+// Strip extra quotes
+const accessToken = typeof rawToken === 'string' ? rawToken.replace(/^"|"$/g, '') : rawToken;
+const refreshToken = typeof rawRefresh === 'string' ? rawRefresh.replace(/^"|"$/g, '') : rawRefresh;
 
-//       if (!accessToken) {
-//         toast.update(toastId, {
-//           render: "Invalid token received ",
-//           type: "error",
-//           isLoading: false,
-//           autoClose: 3000,
-//         });
-//         return;
-//       }
+dispatch(setCredentials({ user: null, token: accessToken, refreshToken }));
 
-//       //  Save to Redux + localStorage
-//  dispatch(
-//   setCredentials({
-//     user: null,
-//     token: accessToken,
-//     refreshToken: null,
-//   })
-// );
+      if (!accessToken) {
+        toast.update(toastId, {
+          render: "Invalid token received",
+          type: "error",
+          isLoading: false,
+          autoClose: 3000,
+        });
+        return;
+      }
 
-      // Success Toast
+      // ✅ Save to Redux (redux-persist will save to localStorage automatically)
+      dispatch(
+        setCredentials({
+          user: null,
+          token: accessToken,
+          refreshToken: refreshToken ?? null,
+        })
+      );
+
       toast.update(toastId, {
-        render: "Login successful ",
+        render: "Login successful",
         type: "success",
         isLoading: false,
         autoClose: 3000,
-        position:"top-right"
-      }, );
+        position: "top-right",
+      });
 
       navigate('/dashboard');
 
     } catch (error: any) {
       console.log("Login Error:", error);
-
       toast.update(toastId, {
-        render: error?.data?.detail || "Login failed ",
+        render: error?.data?.detail || "Login failed",
         type: "error",
         isLoading: false,
         autoClose: 3000,
-         position:"top-right"
+        position: "top-right",
       });
     }
   };
@@ -93,13 +91,11 @@ const LoginPage: React.FC = () => {
         </p>
 
         <form className="space-y-5" onSubmit={handleLogin}>
-
-          {/* Email */}
           <div className="space-y-2">
             <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 block ml-1">
               Email Address
             </label>
-            <input 
+            <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -108,19 +104,18 @@ const LoginPage: React.FC = () => {
             />
           </div>
 
-          {/* Password */}
           <div className="space-y-2 relative">
             <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 block ml-1">
               Password
             </label>
-            <input 
+            <input
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
               className="w-full px-6 py-4 rounded-2xl border border-borderColor bg-[#F9F7F5]"
             />
-            <button 
+            <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-5 top-1/2 -translate-y-1/2"
@@ -129,7 +124,6 @@ const LoginPage: React.FC = () => {
             </button>
           </div>
 
-          {/* Forgot Password */}
           <div className="flex justify-end">
             <button
               type="button"
@@ -140,7 +134,6 @@ const LoginPage: React.FC = () => {
             </button>
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={isLoading}
@@ -148,7 +141,6 @@ const LoginPage: React.FC = () => {
           >
             {isLoading ? "Signing in..." : "Sign In"}
           </button>
-
         </form>
       </div>
     </AuthLayout>
@@ -165,7 +157,6 @@ const EyeIcon = () => (
 );
 
 export default LoginPage;
-
 
 
 

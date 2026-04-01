@@ -9,8 +9,8 @@ interface AuthState {
 
 const initialState: AuthState = {
   user: null,
-  token: localStorage.getItem("token"),
-  refreshToken: localStorage.getItem("refreshToken"),
+  token: null,        
+  refreshToken: null,
 };
 
 const authSlice = createSlice({
@@ -24,21 +24,16 @@ const authSlice = createSlice({
 
       state.user = user;
       state.token = token;
-      state.refreshToken = refreshToken;
+      state.refreshToken = refreshToken ?? null;
 
-      localStorage.setItem("token", token);
-      if (refreshToken) {
-        localStorage.setItem("refreshToken", refreshToken);
-      }
+      
     },
 
     logout: (state) => {
       state.user = null;
       state.token = null;
       state.refreshToken = null;
-
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
+      
     },
   },
 });
