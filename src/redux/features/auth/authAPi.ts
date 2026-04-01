@@ -26,62 +26,11 @@ export const userAPI = baseAPI.injectEndpoints({
   }),
 }),
 
-    refreshToken: build.mutation({
-      query: (refreshToken: string) => ({
-        url: "/token-refresh/",
-        method: "POST",
-        body: { refresh: refreshToken },
-      }),
-    }),
-
-    verifyOTP: build.mutation({
-      query: (data) => ({
-        url: "/verify-email/",
-        method: "POST",
-        body: data,
-      }),
-    }),
-
-    resendOTP: build.mutation({
-      query: (data) => ({
-        url: "/resend-otp/",
-        method: "POST",
-        body: data,
-      }),
-    }),
-
-    forgotPassword: build.mutation({
-      query: (data) => ({
-        url: "/password-forgot-confirm/",
-        method: "POST",
-        body: data,
-      }),
-    }),
-
-    resetPassword: build.mutation({
-      query: (data) => ({
-        url: "/password-forgot-confirm/",
-        method: "POST",
-        body: data,
-      }),
-    }),
-
-    EmailverifyOTP: build.mutation({
-      query: (data) => ({
-        url: "/password-forgot-request/",
-        method: "POST",
-        body: data,
-      }),
-    }),
 
   }),
 });
 
 export const {
   useLoginMutation,
-  useRefreshTokenMutation,
-  useForgotPasswordMutation,
-  useResetPasswordMutation,
-  useVerifyOTPMutation,
-  useEmailverifyOTPMutation,
+
 } = userAPI;
