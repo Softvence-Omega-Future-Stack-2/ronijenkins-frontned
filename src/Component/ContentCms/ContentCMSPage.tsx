@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { FileText, Video, Trash2, Clock, Search, Plus } from "lucide-react";
+import { FileText, Video, Trash2, Clock, Search, Plus, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDeleteContentMutation, useGetAllContentsQuery } from "../../redux/features/admin/content/contentApi";
+import { toast } from "react-toastify";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 type TabKey = "all" | "articles" | "video-guides" | "audio";
 
 interface ContentItem {
@@ -30,74 +31,38 @@ const filterMap: Record<TabKey, ContentItem["type"][]> = {
   audio: ["audio"],
 };
 
-// ─── Content Card ─────────────────────────────────────────────────────────────
-function ContentCard({
-  item,
-  onDelete,
-}: {
-  item: ContentItem;
-  onDelete: (id: string) => void;
-}) {
+//Content Card 
+function ContentCard({ item, onDelete }: { item: ContentItem; onDelete: (id: string) => void }) {
   const navigate = useNavigate();
   const isMedia = item.type === "video" || item.type === "audio";
 
   return (
     <div className="bg-[#FAF7F5] rounded-2xl md:rounded-4xl p-5 border border-borderColor shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all flex flex-col gap-3">
-
-      {/* Top row */}
       <div className="flex justify-between items-start">
         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isMedia ? "bg-[#FAF5FF] border border-[#F3E8FF]" : "bg-[#EFF6FF] border border-[#DBEAFE]"}`}>
-          {isMedia
-            ? <Video size={20} className="text-[#9810FA]" />
-            : <FileText size={20} className="text-[#155DFC]" />}
+          {isMedia ? <Video size={20} className="text-[#9810FA]" /> : <FileText size={20} className="text-[#155DFC]" />}
         </div>
         <span className={`text-xs font-bold tracking-wider rounded-full py-2 px-4 ${
           item.status === "PUBLISHED"
             ? "text-[#00A63E] border border-[#DCFCE7] bg-[#F0FDF4]"
             : "text-[#F54900] bg-[#FFF7ED] border border-borderColor"
-        }`}>
-          {item.status}
-        </span>
+        }`}>{item.status}</span>
       </div>
 
-      {/* Title */}
       <div className="border-b border-borderColor pb-5">
         <h3 className="font-extrabold text-base md:text-lg text-titleColor leading-6 mt-2">{item.title}</h3>
         <p className="text-[11px] text-subTitleColor font-extrabold tracking-wide mt-1">{item.category}</p>
       </div>
 
-      {/* Footer */}
       <div className="flex justify-between items-center mt-auto pt-2 border-t border-[#f5f3ff]">
-        <div className="flex items-center gap-3 text-xs text-[#b0a8cc]">
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <g clipPath="url(#clip0_211_11946)">
-                <path d="M12.8187 6.99213H11.3737C11.119 6.99159 10.8712 7.07447 10.6681 7.2281C10.465 7.38173 10.3178 7.59766 10.2491 7.84285L8.87978 12.7141C8.87096 12.7444 8.85256 12.7709 8.82734 12.7898C8.80213 12.8088 8.77146 12.819 8.73994 12.819C8.70842 12.819 8.67775 12.8088 8.65254 12.7898C8.62732 12.7709 8.60892 12.7444 8.6001 12.7141L5.38368 1.27017C5.37485 1.23991 5.35645 1.21333 5.33123 1.19442C5.30602 1.17551 5.27535 1.16528 5.24383 1.16528C5.21231 1.16528 5.18164 1.17551 5.15643 1.19442C5.13121 1.21333 5.11281 1.23991 5.10399 1.27017L3.73468 6.14141C3.66619 6.38565 3.51989 6.60087 3.31798 6.7544C3.11607 6.90794 2.86958 6.9914 2.61592 6.99213H1.16504" stroke="#4A3A37" strokeOpacity="0.4" strokeWidth="1.16537" strokeLinecap="round" strokeLinejoin="round"/>
-              </g>
-            </svg>
-            <span className="text-[10px] text-[#4A3A3766] font-bold leading-4">{item.views}</span>
+            <Clock size={13} className="text-[#b0a8cc]" />
+            <span className="text-[10px] text-[#4A3A3766] font-bold">{item.date}</span>
           </div>
-          {item.date && (
-            <div className="flex items-center gap-1">
-              <Clock size={13} />
-              <span className="text-[10px] text-[#4A3A3766] font-bold leading-4">{item.date}</span>
-            </div>
-          )}
         </div>
-
         <div className="flex items-center gap-2">
-          {/* View */}
-          <button className="h-6 w-6 cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <g clipPath="url(#clip0_211_12118)">
-                <path d="M1.37268 8.22289C1.31718 8.07338 1.31718 7.90891 1.37268 7.7594C1.91321 6.44877 2.83073 5.32814 4.00892 4.53959C5.18712 3.75104 6.57292 3.33008 7.99065 3.33008C9.40837 3.33008 10.7942 3.75104 11.9724 4.53959C13.1506 5.32814 14.0681 6.44877 14.6086 7.7594C14.6641 7.90891 14.6641 8.07338 14.6086 8.22289C14.0681 9.53353 13.1506 10.6542 11.9724 11.4427C10.7942 12.2313 9.40837 12.6522 7.99065 12.6522C6.57292 12.6522 5.18712 12.2313 4.00892 11.4427C2.83073 10.6542 1.91321 9.53353 1.37268 8.22289Z" stroke="#4A3A37" strokeOpacity="0.4" strokeWidth="1.33185" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M7.99094 9.98896C9.09428 9.98896 9.98872 9.09453 9.98872 7.99118C9.98872 6.88784 9.09428 5.99341 7.99094 5.99341C6.8876 5.99341 5.99316 6.88784 5.99316 7.99118C5.99316 9.09453 6.8876 9.98896 7.99094 9.98896Z" stroke="#4A3A37" strokeOpacity="0.4" strokeWidth="1.33185" strokeLinecap="round" strokeLinejoin="round"/>
-              </g>
-            </svg>
-          </button>
-
-          {/* Edit */}
-          <button onClick={() => navigate(`/dashboard/edit-content/${item.id}`)} className="py-2 px-4 cursor-pointer">
+          <button onClick={() => navigate(`/dashboard/edit-content/${item.id}`)} className="py-2 px-3 cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
               <g clipPath="url(#clip0_211_12122)">
                 <path d="M7.99138 1.9978H3.3299C2.97667 1.9978 2.63791 2.13812 2.38814 2.38789C2.13837 2.63766 1.99805 2.97642 1.99805 3.32965V12.6526C1.99805 13.0058 2.13837 13.3446 2.38814 13.5944C2.63791 13.8441 2.97667 13.9845 3.3299 13.9845H12.6529C13.0061 13.9845 13.3448 13.8441 13.5946 13.5944C13.8444 13.3446 13.9847 13.0058 13.9847 12.6526V7.99113" stroke="#4A3A37" strokeOpacity="0.4" strokeWidth="1.33185" strokeLinecap="round" strokeLinejoin="round"/>
@@ -105,8 +70,6 @@ function ContentCard({
               </g>
             </svg>
           </button>
-
-          {/* Delete */}
           <button onClick={() => onDelete(item.id)} className="cursor-pointer">
             <Trash2 size={14} className="text-red-400" />
           </button>
@@ -116,7 +79,7 @@ function ContentCard({
   );
 }
 
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
+
 function ContentSkeleton() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -139,17 +102,99 @@ function ContentSkeleton() {
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
+
+function Pagination({
+  currentPage,
+  totalPage,
+  onPageChange,
+}: {
+  currentPage: number;
+  totalPage: number;
+  onPageChange: (page: number) => void;
+}) {
+  if (totalPage <= 1) return null;
+
+  const pages = Array.from({ length: totalPage }, (_, i) => i + 1);
+
+  return (
+    <div className="flex items-center justify-center gap-2 mt-6">
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className="p-2 rounded-xl border border-borderColor bg-white disabled:opacity-40 cursor-pointer hover:bg-gray-50 transition-all"
+      >
+        <ChevronLeft size={16} />
+      </button>
+
+      {pages.map((page) => (
+        <button
+          key={page}
+          onClick={() => onPageChange(page)}
+          className={`w-9 h-9 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+            currentPage === page
+              ? "bg-buttonColor text-white border border-buttonColor"
+              : "border border-borderColor bg-white text-subTitleColor hover:bg-gray-50"
+          }`}
+        >
+          {page}
+        </button>
+      ))}
+
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPage}
+        className="p-2 rounded-xl border border-borderColor bg-white disabled:opacity-40 cursor-pointer hover:bg-gray-50 transition-all"
+      >
+        <ChevronRight size={16} />
+      </button>
+    </div>
+  );
+}
+
+
 export default function ContentCMS() {
   const [activeTab, setActiveTab] = useState<TabKey>("all");
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const LIMIT = 5;
   const navigate = useNavigate();
 
-  const { data: rawContents, isLoading, isError } = useGetAllContentsQuery({});
-  const [deleteContent] = useDeleteContentMutation();
+  const { data: result, isLoading, isError } = useGetAllContentsQuery({
+    page: currentPage,
+    
+    limit: LIMIT,
+  },
+{ refetchOnMountOrArgChange: true } );
 
-  // Map API response to local ContentItem shape
-  const allContent: ContentItem[] = (rawContents ?? []).map((item: any) => ({
+  const [deleteContent, ] = useDeleteContentMutation();
+
+const handleDeleteClick = (id: string) => {
+  setDeleteId(id);
+};
+
+const confirmDelete = async () => {
+  if (!deleteId) return;
+
+  try {
+    await deleteContent(deleteId).unwrap();
+    
+    toast.success("Content deleted successfully!", {position:'top-right'});
+    setDeleteId(null);
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to delete content",{position:'top-right'} );
+  }
+}; 
+
+const cancelDelete = () => {
+  setDeleteId(null);
+};
+
+  const rawContents = result?.data ?? [];
+  const meta = result?.meta ?? { page: 1, limit: LIMIT, total: 0, totalPage: 1 };
+
+  const allContent: ContentItem[] = rawContents.map((item: any) => ({
     id: item.id,
     title: item.name || "Untitled",
     type: (item.type?.toLowerCase() ?? "article") as ContentItem["type"],
@@ -165,12 +210,11 @@ export default function ContentCMS() {
       item.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteContent(id).unwrap();
-    } catch (err) {
-      console.error("Delete failed:", err);
-    }
+ 
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -179,20 +223,18 @@ export default function ContentCMS() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row justify-between items-center mb-8 gap-4">
         <div>
-          <h1 className="text-titleColor text-xl sm:text-2xl md:text-[30px] font-extrabold leading-6 md:leading-[36px]">
-            Content CMS
-          </h1>
+          <h1 className="text-titleColor text-xl sm:text-2xl md:text-[30px] font-extrabold leading-6 md:leading-[36px]">Content CMS</h1>
           <p className="text-subTitleColor text-sm font-medium leading-5 mt-0.5">
             Manage articles, videos, and guides
+            {meta.total > 0 && <span className="ml-2 text-buttonColor font-bold">({meta.total} total)</span>}
           </p>
         </div>
-
         <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row items-center gap-4">
           <div className="flex items-center gap-2 bg-white border border-borderColor w-full sm:w-auto px-2 py-3 rounded-2xl">
             <Search size={15} className="text-gray-400 flex-shrink-0" />
             <input
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
               placeholder="Search library..."
               className="outline-none text-sm bg-transparent w-full"
             />
@@ -201,8 +243,7 @@ export default function ContentCMS() {
             onClick={() => navigate('/dashboard/create-content')}
             className="flex w-full sm:w-auto md:w-full lg:w-auto justify-center items-center gap-2 bg-buttonColor font-extrabold px-6 py-3 text-white rounded-2xl cursor-pointer"
           >
-            <Plus size={14} />
-            ADD NEW CONTENT
+            <Plus size={14} /> ADD NEW CONTENT
           </button>
         </div>
       </div>
@@ -212,7 +253,7 @@ export default function ContentCMS() {
         {tabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => { setActiveTab(tab.key); setCurrentPage(1); }}
             className={`px-9 py-4 rounded-full text-xs font-extrabold leading-4 tracking-[1px] transition-all cursor-pointer ${
               activeTab === tab.key
                 ? "border border-[#9266904D] text-buttonColor"
@@ -229,21 +270,59 @@ export default function ContentCMS() {
         {isLoading ? (
           <ContentSkeleton />
         ) : isError ? (
-          <div className="text-center text-red-400 py-12 text-sm">
-            Failed to load content. Please try again.
-          </div>
+          <div className="text-center text-red-400 py-12 text-sm">Failed to load content. Please try again.</div>
         ) : filtered.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((item) => (
-              <ContentCard key={item.id} item={item} onDelete={handleDelete} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filtered.map((item) => (
+                <ContentCard key={item.id} item={item} onDelete={handleDeleteClick}  />
+              ))}
+            </div>
+            <Pagination
+              currentPage={meta.page}
+              totalPage={meta.totalPage}
+              onPageChange={handlePageChange}
+            />
+          </>
         ) : (
-          <div className="text-center text-[#c4b8e8] py-12 text-sm">
-            No content found.
-          </div>
+          <div className="text-center text-[#c4b8e8] py-12 text-sm">No content found.</div>
         )}
       </div>
+
+      {deleteId && (
+  <div onClick={cancelDelete} className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div   className="bg-white rounded-2xl p-6 w-[90%] max-w-md shadow-lg">
+      <div className="flex items-center justify-end text-right mb-2 cursor-pointer">
+        <X/>
+      </div>
+      
+      <h2 className="text-lg font-extrabold text-titleColor text-center mb-3">
+        Confirm Delete
+      </h2>
+
+      <p className="text-sm text-center text-gray-700 mb-6">
+        Are you sure you want to delete this content?
+      </p>
+
+      <div className="flex justify-center gap-3">
+        <button
+          onClick={cancelDelete}
+          className="px-4 py-2 hover:bg-gray-100 rounded-md border border-borderColor text-sm font-semibold cursor-pointer"
+        >
+          No
+        </button>
+
+        <button
+          onClick={confirmDelete}
+          className="px-4 py-2 rounded-md bg-red-500 hover:bg-red-600 text-white text-sm font-semibold cursor-pointer"
+        >
+          Yes, Delete
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
 
     </div>
   );

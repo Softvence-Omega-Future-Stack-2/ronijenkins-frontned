@@ -1,74 +1,153 @@
-
-
-
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseAPI } from "../../api/baseApi";
 
-export interface Subscription {
-  plan_name: string;
-  price: number;
-  stripe_price_id: string | null;
-  status: boolean;
-}
-
-export interface UpdateSubscriptionPricePayload {
-  plan_name: string;
-  price_id: string;
-  price: number;
-}
-
-export interface MessageResponse {
-  message: string;
-}
-
-
-
-export const subscriptionApi = baseAPI.injectEndpoints({
-  endpoints: (builder) => ({
-
-
-    getSubscriptions: builder.query<Subscription[], void>({
-      query: () => ({
-        url: "/subscriptions/list/",
-        method: "GET",
+export const subscriptionAPI = baseAPI.injectEndpoints({
+  endpoints: (build) => ({
+    // ১. সকল সাবস্ক্রিপশন লিস্ট দেখার জন্য
+   getSubscriptionPlans: build.query({
+      query: (params?: { page?: number; limit?: number }) => ({
+        url: "",
+        method: "POST",
+        body: {
+          // ⚠️ আপনার পোস্টম্যান ইমেজ অনুযায়ী টাইপ চেক করুন
+          query: `
+            query SubscriptionPlans($input: GetAllGenericArgs!) {
+              SubscriptionPlans(input: $input) {
+                id
+                name
+                description
+                features
+                price
+                plan
+                status
+                createdAt
+                updatedAt
+              }
+            }
+          `,
+          variables: {
+            input: {
+              pagination: {
+                limit: params?.limit ?? 10,
+                page: params?.page ?? 1,
+              },
+            },
+          },
+        },
       }),
-      // providesTags: ["Subscription"],
+      // ডাটা সরাসরি 'data' তে আছে কি না কনসোল করে শিওর হয়ে নিন
+      transformResponse: (response: any) => response, 
+      providesTags: ["Subscription"],
     }),
+    // ২. নতুন সাবস্ক্রিপশন প্ল্যান তৈরি করার জন্য (যদি লাগে)
+  createSubscriptionPlan: build.mutation({
+  query: (data) => ({
+    url: "",
+    method: "POST",
+    body: {
+      query: `
+        mutation createSubscriptionPlan($input: CreateSubscriptionPlanInput!) {
+          createSubscriptionPlan(input: $input) {
+            id
+            name
+            plan
+            price
+            status
+          }
+        }
+      `,
+      variables: {
+        input: {
+          name: data.name,
+          description: data.description,
+          features: data.features,
+          plan: data.plan, // এখানে 'MONTHLY' অথবা 'YEARLY' যাবে
+          price: Number(data.price), // নিশ্চিত করুন এটি নম্বর হিসেবে যাচ্ছে
+          status: data.status,
+          trialPeriod: data.trialPeriod,
+          stripePriceId: data.stripePriceId,
+        },
+      },
+    },
+  }),
+  invalidatesTags: ["Subscription"],
+}),
 
+updateSubscriptionPlan: build.mutation({
+  query: ({ id, ...data }) => ({
+    url: "",
+    method: "POST",
+    body: {
+      query: `
+        mutation updateSubscriptionPlan($id: String!, $input: UpdateSubscriptionPlanInput!) {
+          updateSubscriptionPlan(id: $id, input: $input) {
+            id
+            name
+            description
+            features
+            plan
+            price
+            status
+            stripePriceId
+            trialPeriod
+          }
+        }
+      `,
+      variables: {
+        id,
+        input: {
+          name: data.name,
+          description: data.description,
+          features: data.features,
+          plan: data.plan, // 'MONTHLY', 'YEARLY', বা 'FREE'
+          price: Number(data.price),
+          status: data.status,
+          stripePriceId: data.stripePriceId,
+          trialPeriod: data.trialPeriod,
+        },
+      },
+    },
+  }),
+  invalidatesTags: ["Subscription"],
+}),
 
-    updateSubscriptionPrice: builder.mutation<
-      MessageResponse,
-      UpdateSubscriptionPricePayload
-    >({
-      query: ({ plan_name, price_id, price }) => ({
-        url: `/subscriptions/update-price/${plan_name}/`,
-        method: "PUT",
-        body: { price_id, price },
+removeSubscriptionPlan: build.mutation({
+      query: (id: string) => ({
+        url: "",
+        method: "POST",
+        body: {
+          query: `
+            mutation removeSubscriptionPlan ($id: String!) {
+              removeSubscriptionPlan (id: $id) 
+            }
+          `,
+          variables: { id },
+        },
       }),
-      // invalidatesTags: ["Subscription"],
+      invalidatesTags: ["Subscription"],
     }),
-
-
-    toggleFreeTier: builder.mutation<MessageResponse, void>({
-      query: () => ({
-        url: "/subscriptions/toggle-free-tier/",
-        method: "PUT",
+    updateSubscriptionStatus: build.mutation({
+      query: ({ id, status }) => ({
+        url: "",
+        method: "POST",
+        body: {
+          query: `
+            mutation updateSubscriptionPlanStatus ($id: String!, $status: SubscriptionPlanStatus!) {
+              updateSubscriptionPlanStatus (id: $id, status: $status) { id status }
+            }
+          `,
+          variables: { id, status },
+        },
       }),
-      // invalidatesTags: ["Subscription"],
+      invalidatesTags: ["Subscription"],
     }),
-
   }),
 });
 
-
-
-export const {
-  useGetSubscriptionsQuery,
-  useUpdateSubscriptionPriceMutation,
-  useToggleFreeTierMutation,
-} = subscriptionApi;
-
-
-
-
-
+export const { 
+  useGetSubscriptionPlansQuery, 
+  useCreateSubscriptionPlanMutation, 
+  useUpdateSubscriptionPlanMutation,
+  useRemoveSubscriptionPlanMutation,
+  useUpdateSubscriptionStatusMutation
+} = subscriptionAPI;

@@ -2,10 +2,12 @@ import { Menu, Search, } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import profileImg from '../../public/img/Container.png'
+import { useGetAdminProfileQuery } from '../redux/features/admin/profileApi';
 
 const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const [searchValue, setSearchValue] = useState('');
   const navigate = useNavigate();
+  const { data: admin } = useGetAdminProfileQuery(undefined);
 
   return (
     <header
@@ -53,13 +55,22 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
         {/* User Avatar + Info */}
         <div onClick={()=> navigate('/dashboard/profile')} className="flex items-center border border-borderColor bg-[#FAF7F5] rounded-2xl py-1 px-4 gap-2.5 cursor-pointer group">
           <div className="relative flex-shrink-0">
-            <img src={profileImg} alt="" />
+            <img 
+  src={admin?.avatar || profileImg} 
+  alt="profile" 
+  className="w-10 h-10 rounded-full object-cover"
+/>
             
           </div>
 
           <div className="hidden sm:block text-left">
-            <p className="text-[13px] font-black text-titleColro leading-tight">Nolan</p>
-            <p className="text-[11px] text-[#4A3A3766] font-black leading-tight uppercase tracking-wide">Super Admin</p>
+            <p className="text-[13px] font-black text-titleColro leading-tight">
+  {admin?.username || "Admin"}
+</p>
+
+<p className="text-[11px] text-[#4A3A3766] font-black leading-tight uppercase tracking-wide">
+  {admin?.role || "SUPER ADMIN"}
+</p>
           </div>
         </div>
       </div>
