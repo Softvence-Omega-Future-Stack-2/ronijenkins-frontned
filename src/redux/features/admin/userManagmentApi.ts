@@ -1,83 +1,182 @@
+// import { baseAPI } from "../../api/baseApi";
+
+// export const customerApi = baseAPI.injectEndpoints({
+//   endpoints: (build) => ({
+   
+
+// getCustomers: build.query({
+//   query: ({ page = 1, limit = 10 }) => ({
+//     method: "POST",
+//     body: {
+//       query: `
+//         query customers($input: GetAllGenericArgs) {
+//           customers(input: $input) {
+//             id
+//             email
+//             username
+//             role
+//             status
+//             createdAt
+//             customer {
+//               fullName
+//               address
+//             }
+//           }
+//         }
+//       `,
+//       variables: {
+//         input: {
+//           pagination: {
+//             limit: limit,
+//             page: page,
+//           },
+//         },
+//       },
+//     },
+//   }),
+//   // ✅ আপনার স্ক্রিনশট অনুযায়ী রেসপন্স থেকে সরাসরি data বের করে আনা
+//   transformResponse: (response: any) => {
+//     // যদি রেসপন্স সরাসরি { data: [...] } হয়
+//     if (response && response.data) {
+//        return response.data; 
+//     }
+//     // যদি GraphQL র‍্যাপার থাকে { data: { customers: { data: [...] } } }
+//     return response?.data?.customers?.data || response?.data?.customers || [];
+//   },
+//   providesTags: ["Customers"],
+// }),
+
+//     // ✅ নির্দিষ্ট কাস্টমারের Health Goals গেট করার কুয়েরি
+//     getHealthGoalsByCustomerId: build.query({
+//       query: (customerId: string) => ({
+//         method: "POST",
+//         body: {
+//           query: `
+//             query getHealthGoalsByCustomerId($customerId: String!) {
+//               getHealthGoalsByCustomerId(customerId: $customerId) {
+//                 category
+//                 createdAt
+//                 currentValue
+//                 customerId
+//                 endDate
+//                 id
+//                 name
+//                 notes
+//                 startDate
+//                 targetValue
+//                 updatedAt
+//                 whatMeasuring
+//               }
+//             }
+//           `,
+//           variables: { customerId },
+//         },
+//       }),
+//       transformResponse: (response: any) => response.data.getHealthGoalsByCustomerId,
+//       providesTags: ["HealthGoals"],
+//     }),
+//   }),
+// });
+
+// export const { 
+//   useGetCustomersQuery, 
+//   useGetHealthGoalsByCustomerIdQuery 
+// } = customerApi;
+
+
+
+
+
+
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseAPI } from "../../api/baseApi";
 
-export interface UserSubscription {
-  name: string;
-  expire_date: string;
-}
-
-export interface UserFeatureUsages {
-  behaviours_usage: number;
-  supplements_usage: number;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  full_name: string;
-  image: string | null;
-  phone: string | null;
-  address: string | null;
-  is_active: boolean;
-  subscription: UserSubscription | null;
-  feature_usages: UserFeatureUsages;
-}
-
-export interface UserListResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: User[];
-}
-
-export interface GetUsersParams {
-  page?: number;
-  page_size?: number;
-  search?: string;
-  plan?: 'free' | 'premium' | '';
-  ordering?: string;
-}
-
-export const userManagementApi = baseAPI.injectEndpoints({
-  endpoints: (builder) => ({
-    getUsers: builder.query<UserListResponse, GetUsersParams>({
-      query: ({ page = 1, page_size = 10, search = '', plan = '', ordering = '' }) => {
-        const params = new URLSearchParams();
-        params.append('page', String(page));
-        params.append('page_size', String(page_size));
-        if (search) params.append('search', search);
-        if (plan) params.append('plan', plan);
-        if (ordering) params.append('ordering', ordering);
-        return { url: `/admin/users/?${params.toString()}`, method: 'GET' };
-      },
-      providesTags: ['Users'],
-    }),
-
-    activateUser: builder.mutation<void, string>({
-  query: (id) => ({
-    url: `/admin/users/${id}/activate/`,
-    method: 'PATCH',
-  }),
-  invalidatesTags: ['Users'],
-}),
-
-deactivateUser: builder.mutation<void, string>({
-  query: (id) => ({
-    url: `/admin/users/${id}/deactivate/`,
-    method: 'PATCH',
-  }),
-  invalidatesTags: ['Users'],
-}),
-
-deleteUser: builder.mutation<void, string>({
-      query: (id) => ({
-        url: `/admin/users/${id}/delete/`,
-        method: 'DELETE',
+export const userAPI = baseAPI.injectEndpoints({
+  endpoints: (build) => ({
+    getAllUsers: build.query({
+      query: (params?: { page?: number; limit?: number }) => ({
+        url: "",
+        method: "POST",
+        body: {
+          query: `
+            query getAll($input: GetAllGenericArgs) {
+              getAll(input: $input) {
+                id
+                username
+                email
+                role
+                status
+                avatar
+                contactNo
+                createdAt
+                lang
+              }
+            }
+          `,
+          variables: {
+            input: {
+              pagination: {
+                limit: params?.limit ?? 5,
+                page: params?.page ?? 1,
+              },
+            },
+          },
+        },
       }),
-      invalidatesTags: ['Users'],
+      // ✅ transformResponse আপাতত একদম সিম্পল রাখুন
+      transformResponse: (response: any) => response, 
+      providesTags: ["Users"],
     }),
 
+
+    // userApi.ts
+getUser: build.query({
+  query: (id: string) => ({
+    url: "", // আপনার GraphQL endpoint
+    method: "POST",
+    body: {
+      query: `
+        query getUser($id: String!) {
+          getUser(id: $id) {
+            id
+            username
+            email
+            role
+            status
+            avatar
+            contactNo
+            createdAt
+            lang
+          }
+        }
+      `,
+      variables: { id },
+    },
   }),
-  overrideExisting: true,
+  providesTags: ( id) => [{ type: "Users", id }],
+}),
+   
+// userApi.ts
+changeUserStatus: build.mutation({
+  query: (statusInput) => ({
+    url: "", // আপনার GraphQL বা REST endpoint
+    method: "POST",
+    body: {
+      query: `
+        mutation changeUserStatus($input: ChangeUserStatusInput!) {
+          changeUserStatus(input: $input) {
+            id
+            status
+          }
+        }
+      `,
+      variables: { input: statusInput },
+    },
+  }),
+  invalidatesTags: ["Users"],
+}),
+  }),
 });
 
-export const { useGetUsersQuery , useActivateUserMutation, useDeactivateUserMutation, useDeleteUserMutation } = userManagementApi;
+export const { useGetAllUsersQuery, useChangeUserStatusMutation, useGetUserQuery } = userAPI;

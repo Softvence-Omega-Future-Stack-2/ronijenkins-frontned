@@ -27,10 +27,23 @@ export const userAPI = baseAPI.injectEndpoints({
 }),
 
 
-  }),
+changePassword: build.mutation({
+      query: ({ newPass, oldPass }) => ({
+        method: "POST",
+        body: {
+          query: `
+            mutation changePassword($newPass: String!, $oldPass: String!) {
+              changePassword(newPass: $newPass, oldPass: $oldPass)
+            }
+          `,
+          variables: { newPass, oldPass },
+        },
+      }),
+    }),
+  })
 });
 
 export const {
   useLoginMutation,
-
+  useChangePasswordMutation
 } = userAPI;
