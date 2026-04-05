@@ -40,7 +40,7 @@ export const subscriptionAPI = baseAPI.injectEndpoints({
       providesTags: ["Subscription"],
     }),
     // ২. নতুন সাবস্ক্রিপশন প্ল্যান তৈরি করার জন্য (যদি লাগে)
-  createSubscriptionPlan: build.mutation({
+createSubscriptionPlan: build.mutation({
   query: (data) => ({
     url: "",
     method: "POST",
@@ -48,11 +48,8 @@ export const subscriptionAPI = baseAPI.injectEndpoints({
       query: `
         mutation createSubscriptionPlan($input: CreateSubscriptionPlanInput!) {
           createSubscriptionPlan(input: $input) {
-            id
-            name
-            plan
-            price
-            status
+            id name plan price status description
+            features stripePriceId trialPeriod createdAt updatedAt
           }
         }
       `,
@@ -61,8 +58,8 @@ export const subscriptionAPI = baseAPI.injectEndpoints({
           name: data.name,
           description: data.description,
           features: data.features,
-          plan: data.plan, // এখানে 'MONTHLY' অথবা 'YEARLY' যাবে
-          price: Number(data.price), // নিশ্চিত করুন এটি নম্বর হিসেবে যাচ্ছে
+          plan: data.plan,          // "Monthly" or "Yearly"
+          price: Number(data.price),
           status: data.status,
           trialPeriod: data.trialPeriod,
           stripePriceId: data.stripePriceId,

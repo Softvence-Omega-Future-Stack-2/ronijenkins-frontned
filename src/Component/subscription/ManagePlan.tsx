@@ -5,10 +5,14 @@ import { toast } from 'react-toastify';
 import { Trash2 } from 'lucide-react';
 
 export interface Plan {
-  id?: string; // যদি id থাকে
+  id: string;
   name: string;
-  monthlyPrice: number;
-  yearlyPrice: number;
+  description?: string;
+  plan: | "FREE" | "MONTHLY" | "YEARLY"; 
+  price: number;
+  status: "ACTIVE" | "INACTIVE";
+  stripePriceId: string;
+  trialPeriod: boolean;
   features: string[];
 }
 
@@ -18,12 +22,12 @@ const ManagePlan: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<"MONTHLY" | "YEARLY">("MONTHLY");
 
   // API Calls
-  const { data: rawResponse, isLoading, isError , refetch  } = useGetSubscriptionPlansQuery({ page: 1, limit: 100 });
+  const { data: rawResponse, isLoading , refetch  } = useGetSubscriptionPlansQuery({ page: 1, limit: 100 });
   const [createPlan] = useCreateSubscriptionPlanMutation();
   const [updatePlan] = useUpdateSubscriptionPlanMutation();
   const [confirmDeletePlan, setConfirmDeletePlan] = useState<any | null>(null);
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [, setPlans] = useState<Plan[]>([]);
+  // const [modalOpen, setModalOpen] = useState(false);
   const [removePlan, { isLoading: isDeleting }] = useRemoveSubscriptionPlanMutation();
 
 
@@ -123,8 +127,16 @@ const processDelete = async () => {
 
           <div className="flex flex-wrap gap-6 justify-center md:justify-start">
             {planList.map((group: any, idx: number) => {
-              const activePlan = billingCycle === "MONTHLY" ? group.monthly : group.yearly;
-              const displayPlan = activePlan || group.free || group.monthly || group.yearly;
+              const displayPlan =
+  billingCycle === "MONTHLY"
+    ? group.monthly || group.free   // monthly না থাকলে free
+    : group.yearly;                 // yearly হলে শুধু yearly
+
+// ❌ yearly না থাকলে card show হবে না
+if (!displayPlan) return null;
+
+
+if (!displayPlan) return null;
 
               if (!displayPlan) return null;
 

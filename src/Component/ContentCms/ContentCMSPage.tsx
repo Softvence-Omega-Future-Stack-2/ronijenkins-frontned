@@ -1,68 +1,81 @@
 import { useState } from "react";
 import { FileText, Video, Trash2, Clock, Search, Plus, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useDeleteContentMutation, useGetAllContentsQuery } from "../../redux/features/admin/content/contentApi";
+import {
+  useDeleteContentMutation,
+  useGetAllContentsQuery,
+  type ContentItem,
+} from "../../redux/features/admin/content/contentApi";
 import { toast } from "react-toastify";
 
-
-type TabKey = "all" | "articles" | "video-guides" | "audio";
-
-interface ContentItem {
-  id: string;
-  title: string;
-  type: "article" | "video" | "audio";
-  status: string;
-  category: string;
-  views: number;
-  date?: string;
-}
+// ─── Types ────────────────────────────────────────────────────────────────────
+type TabKey = "all" | "articles" | "video-guides";
 
 const tabs: { key: TabKey; label: string }[] = [
-  { key: "all", label: "ALL CONTENT" },
-  { key: "articles", label: "ARTICLES" },
+  { key: "all",          label: "ALL CONTENT"  },
+  { key: "articles",     label: "ARTICLES"     },
   { key: "video-guides", label: "VIDEO GUIDES" },
-  { key: "audio", label: "AUDIO" },
 ];
 
+// ✅ uppercase — must match ContentItem["type"] exactly
 const filterMap: Record<TabKey, ContentItem["type"][]> = {
-  all: ["article", "video", "audio"],
-  articles: ["article"],
-  "video-guides": ["video"],
-  audio: ["audio"],
+  all:           ["ARTICLE", "VIDEO"],
+  articles:      ["ARTICLE"],
+  "video-guides":["VIDEO"],
 };
 
-//Content Card 
-function ContentCard({ item, onDelete }: { item: ContentItem; onDelete: (id: string) => void }) {
+// ─── Content Card ─────────────────────────────────────────────────────────────
+function ContentCard({
+  item,
+  onDelete,
+}: {
+  item: ContentItem;
+  onDelete: (id: string) => void;
+}) {
   const navigate = useNavigate();
-  const isMedia = item.type === "video" || item.type === "audio";
+  const isMedia = item.type === "VIDEO";
 
   return (
     <div className="bg-[#FAF7F5] rounded-2xl md:rounded-4xl p-5 border border-borderColor shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all flex flex-col gap-3">
       <div className="flex justify-between items-start">
         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isMedia ? "bg-[#FAF5FF] border border-[#F3E8FF]" : "bg-[#EFF6FF] border border-[#DBEAFE]"}`}>
-          {isMedia ? <Video size={20} className="text-[#9810FA]" /> : <FileText size={20} className="text-[#155DFC]" />}
+          {isMedia
+            ? <Video size={20} className="text-[#9810FA]" />
+            : <FileText size={20} className="text-[#155DFC]" />
+          }
         </div>
         <span className={`text-xs font-bold tracking-wider rounded-full py-2 px-4 ${
           item.status === "PUBLISHED"
             ? "text-[#00A63E] border border-[#DCFCE7] bg-[#F0FDF4]"
             : "text-[#F54900] bg-[#FFF7ED] border border-borderColor"
-        }`}>{item.status}</span>
+        }`}>
+          {item.status}
+        </span>
       </div>
 
       <div className="border-b border-borderColor pb-5">
-        <h3 className="font-extrabold text-base md:text-lg text-titleColor leading-6 mt-2">{item.title}</h3>
-        <p className="text-[11px] text-subTitleColor font-extrabold tracking-wide mt-1">{item.category}</p>
+        {/* ✅ item.name — ContentItem has `name`, not `title` */}
+        <h3 className="font-extrabold text-base md:text-lg text-titleColor leading-6 mt-2">
+          {item.name}
+        </h3>
+        <p className="text-[11px] text-subTitleColor font-extrabold tracking-wide mt-1">
+          {item.category}
+        </p>
       </div>
 
       <div className="flex justify-between items-center mt-auto pt-2 border-t border-[#f5f3ff]">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1">
-            <Clock size={13} className="text-[#b0a8cc]" />
-            <span className="text-[10px] text-[#4A3A3766] font-bold">{item.date}</span>
-          </div>
+        <div className="flex items-center gap-1">
+          <Clock size={13} className="text-[#b0a8cc]" />
+          {/* ✅ item.createdAt — ContentItem has createdAt */}
+          <span className="text-[10px] text-[#4A3A3766] font-bold">
+            {item.createdAt?.slice(0, 10)}
+          </span>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => navigate(`/dashboard/edit-content/${item.id}`)} className="py-2 px-3 cursor-pointer">
+          <button
+            onClick={() => navigate(`/dashboard/edit-content/${item.id}`)}
+            className="py-2 px-3 cursor-pointer"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
               <g clipPath="url(#clip0_211_12122)">
                 <path d="M7.99138 1.9978H3.3299C2.97667 1.9978 2.63791 2.13812 2.38814 2.38789C2.13837 2.63766 1.99805 2.97642 1.99805 3.32965V12.6526C1.99805 13.0058 2.13837 13.3446 2.38814 13.5944C2.63791 13.8441 2.97667 13.9845 3.3299 13.9845H12.6529C13.0061 13.9845 13.3448 13.8441 13.5946 13.5944C13.8444 13.3446 13.9847 13.0058 13.9847 12.6526V7.99113" stroke="#4A3A37" strokeOpacity="0.4" strokeWidth="1.33185" strokeLinecap="round" strokeLinejoin="round"/>
@@ -79,7 +92,7 @@ function ContentCard({ item, onDelete }: { item: ContentItem; onDelete: (id: str
   );
 }
 
-
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
 function ContentSkeleton() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -102,7 +115,7 @@ function ContentSkeleton() {
   );
 }
 
-
+// ─── Pagination ───────────────────────────────────────────────────────────────
 function Pagination({
   currentPage,
   totalPage,
@@ -113,7 +126,6 @@ function Pagination({
   onPageChange: (page: number) => void;
 }) {
   if (totalPage <= 1) return null;
-
   const pages = Array.from({ length: totalPage }, (_, i) => i + 1);
 
   return (
@@ -125,7 +137,6 @@ function Pagination({
       >
         <ChevronLeft size={16} />
       </button>
-
       {pages.map((page) => (
         <button
           key={page}
@@ -139,7 +150,6 @@ function Pagination({
           {page}
         </button>
       ))}
-
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPage}
@@ -151,66 +161,48 @@ function Pagination({
   );
 }
 
-
+// ─── Main Page ────────────────────────────────────────────────────────────────
 export default function ContentCMS() {
-  const [activeTab, setActiveTab] = useState<TabKey>("all");
-  const [search, setSearch] = useState("");
+  const [activeTab, setActiveTab]   = useState<TabKey>("all");
+  const [search, setSearch]         = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteId, setDeleteId]     = useState<string | null>(null);
   const LIMIT = 5;
   const navigate = useNavigate();
 
-  const { data: result, isLoading, isError } = useGetAllContentsQuery({
-    page: currentPage,
-    
-    limit: LIMIT,
-  },
-{ refetchOnMountOrArgChange: true } );
-
-  const [deleteContent, ] = useDeleteContentMutation();
-
-const handleDeleteClick = (id: string) => {
-  setDeleteId(id);
-};
-
-const confirmDelete = async () => {
-  if (!deleteId) return;
-
-  try {
-    await deleteContent(deleteId).unwrap();
-    
-    toast.success("Content deleted successfully!", {position:'top-right'});
-    setDeleteId(null);
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to delete content",{position:'top-right'} );
-  }
-}; 
-
-const cancelDelete = () => {
-  setDeleteId(null);
-};
-
-  const rawContents = result?.data ?? [];
-  const meta = result?.meta ?? { page: 1, limit: LIMIT, total: 0, totalPage: 1 };
-
-  const allContent: ContentItem[] = rawContents.map((item: any) => ({
-    id: item.id,
-    title: item.name || "Untitled",
-    type: (item.type?.toLowerCase() ?? "article") as ContentItem["type"],
-    status: item.status ?? "DRAFT",
-    category: item.category || "General",
-    views: item.impressions ?? 0,
-    date: item.createdAt?.slice(0, 10),
-  }));
-
-  const filtered = allContent.filter(
-    (item) =>
-      filterMap[activeTab].includes(item.type) &&
-      item.title.toLowerCase().includes(search.toLowerCase())
+  const { data: result, isLoading, isError } = useGetAllContentsQuery(
+    { page: currentPage, limit: LIMIT },
+    { refetchOnMountOrArgChange: true },
   );
 
- 
+  const [deleteContent] = useDeleteContentMutation();
+
+  const handleDeleteClick = (id: string) => setDeleteId(id);
+  const cancelDelete      = ()            => setDeleteId(null);
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    try {
+      await deleteContent(deleteId).unwrap();
+      toast.success("Content deleted successfully!", { position: "top-right" });
+      setDeleteId(null);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete content", { position: "top-right" });
+    }
+  };
+
+  // ✅ Use data directly — no remapping needed
+  // rawContents is already ContentItem[] from the API
+  const rawContents: ContentItem[] = result?.data ?? [];
+  const meta = result?.meta ?? { page: 1, limit: LIMIT, total: 0, totalPage: 1 };
+
+  // ✅ Filter: type is already uppercase ("ARTICLE" | "VIDEO"), search by item.name
+  const filtered = rawContents.filter(
+    (item) =>
+      filterMap[activeTab].includes(item.type) &&
+      (item.name ?? "").toLowerCase().includes(search.toLowerCase()),
+  );
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -223,10 +215,14 @@ const cancelDelete = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row justify-between items-center mb-8 gap-4">
         <div>
-          <h1 className="text-titleColor text-xl sm:text-2xl md:text-[30px] font-extrabold leading-6 md:leading-[36px]">Content CMS</h1>
+          <h1 className="text-titleColor text-xl sm:text-2xl md:text-[30px] font-extrabold leading-6 md:leading-[36px]">
+            Content CMS
+          </h1>
           <p className="text-subTitleColor text-sm font-medium leading-5 mt-0.5">
             Manage articles, videos, and guides
-            {meta.total > 0 && <span className="ml-2 text-buttonColor font-bold">({meta.total} total)</span>}
+            {meta.total > 0 && (
+              <span className="ml-2 text-buttonColor font-bold">({meta.total} total)</span>
+            )}
           </p>
         </div>
         <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row items-center gap-4">
@@ -240,7 +236,7 @@ const cancelDelete = () => {
             />
           </div>
           <button
-            onClick={() => navigate('/dashboard/create-content')}
+            onClick={() => navigate("/dashboard/create-content")}
             className="flex w-full sm:w-auto md:w-full lg:w-auto justify-center items-center gap-2 bg-buttonColor font-extrabold px-6 py-3 text-white rounded-2xl cursor-pointer"
           >
             <Plus size={14} /> ADD NEW CONTENT
@@ -270,12 +266,14 @@ const cancelDelete = () => {
         {isLoading ? (
           <ContentSkeleton />
         ) : isError ? (
-          <div className="text-center text-red-400 py-12 text-sm">Failed to load content. Please try again.</div>
+          <div className="text-center text-red-400 py-12 text-sm">
+            Failed to load content. Please try again.
+          </div>
         ) : filtered.length > 0 ? (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filtered.map((item) => (
-                <ContentCard key={item.id} item={item} onDelete={handleDeleteClick}  />
+                <ContentCard key={item.id} item={item} onDelete={handleDeleteClick} />
               ))}
             </div>
             <Pagination
@@ -285,44 +283,48 @@ const cancelDelete = () => {
             />
           </>
         ) : (
-          <div className="text-center text-[#c4b8e8] py-12 text-sm">No content found.</div>
+          <div className="text-center text-[#c4b8e8] py-12 text-sm">
+            No content found.
+          </div>
         )}
       </div>
 
+      {/* Delete Modal */}
       {deleteId && (
-  <div onClick={cancelDelete} className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div   className="bg-white rounded-2xl p-6 w-[90%] max-w-md shadow-lg">
-      <div className="flex items-center justify-end text-right mb-2 cursor-pointer">
-        <X/>
-      </div>
-      
-      <h2 className="text-lg font-extrabold text-titleColor text-center mb-3">
-        Confirm Delete
-      </h2>
-
-      <p className="text-sm text-center text-gray-700 mb-6">
-        Are you sure you want to delete this content?
-      </p>
-
-      <div className="flex justify-center gap-3">
-        <button
+        <div
           onClick={cancelDelete}
-          className="px-4 py-2 hover:bg-gray-100 rounded-md border border-borderColor text-sm font-semibold cursor-pointer"
+          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
         >
-          No
-        </button>
-
-        <button
-          onClick={confirmDelete}
-          className="px-4 py-2 rounded-md bg-red-500 hover:bg-red-600 text-white text-sm font-semibold cursor-pointer"
-        >
-          Yes, Delete
-        </button>
-      </div>
-
-    </div>
-  </div>
-)}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-2xl p-6 w-[90%] max-w-md shadow-lg"
+          >
+            <div className="flex items-center justify-end mb-2 cursor-pointer" onClick={cancelDelete}>
+              <X />
+            </div>
+            <h2 className="text-lg font-extrabold text-titleColor text-center mb-3">
+              Confirm Delete
+            </h2>
+            <p className="text-sm text-center text-gray-700 mb-6">
+              Are you sure you want to delete this content?
+            </p>
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 hover:bg-gray-100 rounded-md border border-borderColor text-sm font-semibold cursor-pointer"
+              >
+                No
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 rounded-md bg-red-500 hover:bg-red-600 text-white text-sm font-semibold cursor-pointer"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

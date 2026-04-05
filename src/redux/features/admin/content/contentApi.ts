@@ -1,6 +1,51 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseAPI } from "../../../api/baseApi";
 
+export interface CreateContentInput {
+  name: string;
+  slug: string;
+  description: string;
+  time: number;
+  status: 'PUBLISHED' | 'DRAFT' | 'ARCHIVED';
+  type: 'ARTICLE' | 'VIDEO' | 'AUDIO';
+  category: string;
+  notify: boolean;
+  locked: boolean;
+}
+ 
+export interface UpdateContentInput {
+  name?: string;
+  description?: string;
+  time?: number;
+  status?: 'PUBLISHED' | 'DRAFT' | 'ARCHIVED';
+  type?: 'ARTICLE' | 'VIDEO' | 'AUDIO';
+  category?: string;
+  notify?: boolean;
+  locked?: boolean;
+}
+ 
+export interface ContentItem {
+  id: string;
+  name: string;
+  slug: string;
+  date:string
+  description: string | null;
+  type: 'ARTICLE' | 'VIDEO' | 'AUDIO';
+  category: string | null;
+  time: number | null;
+  thumbnail: string | null;
+  notify: boolean;
+  locked: boolean;
+  status: 'PUBLISHED' | 'DRAFT' | 'ARCHIVED';
+  videoUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const CONTENT_FIELDS = `
+  id name slug description type category time
+  thumbnail notify locked status videoUrl createdAt updatedAt
+`;
 export const contentAPI = baseAPI.injectEndpoints({
   endpoints: (build) => ({
 
@@ -97,66 +142,103 @@ createContent: build.mutation({
   query: (data: { input: any; thumbnail?: File | null; video?: File | null }) => {
     const formData = new FormData();
 
-    formData.append("operations", JSON.stringify({
+    // ১. অপারেশনস তৈরি করা
+    const operations = {
       query: `
         mutation createContent($input: CreateContentInput!, $thumbnail: Upload, $video: Upload) {
           createContent(input: $input, thumbnail: $thumbnail, video: $video) {
-            id name slug thumbnail videoUrl
+            id
+            name
+            slug
+            thumbnail
+            videoUrl
           }
         }
       `,
-      variables: { input: data.input, thumbnail: null, video: null },
-    }));
+      variables: { 
+        input: data.input, 
+        thumbnail: null, 
+        video: null 
+      },
+    };
+    formData.append("operations", JSON.stringify(operations));
 
-    // ✅ সবসময় "0" আর "1" দিতে হবে
-    formData.append("map", JSON.stringify({
-      "0": ["variables.thumbnail"],
-      "1": ["variables.video"]
-    }));
+    // ২. ডাইনামিক ম্যাপ তৈরি (ফাইল থাকলেই কেবল অ্যাড হবে)
+ const map: Record<string, string[]> = {};
+let fileIndex = 0;
 
-    // ✅ file না থাকলে empty blob দাও
-    formData.append("0", data.thumbnail ?? new Blob([]), data.thumbnail?.name ?? "");
-    formData.append("1", data.video ?? new Blob([]), data.video?.name ?? "");
+if (data.thumbnail) {
+  map[fileIndex] = ["variables.thumbnail"];
+  formData.append(String(fileIndex), data.thumbnail);
+  fileIndex++;
+}
+
+if (data.video) {
+  map[fileIndex] = ["variables.video"];
+  formData.append(String(fileIndex), data.video);
+  fileIndex++;
+}
+
+formData.append("map", JSON.stringify(map));
+
+    
+  
 
     return {
-      url: "",
+      url: "", // আপনার baseApi-তে যদি /graphql দেওয়া থাকে তবে এটি খালি রাখুন
       method: "POST",
       body: formData,
-      headers: { "Content-Type": undefined as any },
+      // RTK Query স্বয়ংক্রিয়ভাবে Content-Type সেট করবে যদি আপনি এটি undefined রাখেন
     };
+
+    
   },
-  invalidatesTags: [{ type: "Content" as const, id: "LIST" }],
+  
+  invalidatesTags: ["Content"],
 }),
 
     // UPDATE CONTENT 
-    updateContent: build.mutation({
-      query: (data: { id: string; input: any; thumbnail?: File | null; video?: File | null }) => {
+updateContent: build.mutation<
+      ContentItem,
+      { id: string; input: UpdateContentInput; thumbnail?: File | null; video?: File | null }
+    >({
+      query: ({ id, input, thumbnail, video }) => {
         const formData = new FormData();
-        formData.append("operations", JSON.stringify({
+ 
+        const operations = JSON.stringify({
           query: `
-            mutation updateContent($id: String!, $input: UpdateContentInput!, $thumbnail: Upload, $video: Upload) {
+            mutation updateContent(
+              $id: ID!
+              $input: UpdateContentInput!
+              $thumbnail: Upload
+              $video: Upload
+            ) {
               updateContent(id: $id, input: $input, thumbnail: $thumbnail, video: $video) {
-                id name slug thumbnail videoUrl status
+                ${CONTENT_FIELDS}
               }
             }
           `,
-          variables: { id: data.id, input: data.input, thumbnail: null, video: null },
-        }));
-
-        const map: any = {};
-        let i = 0;
-        if (data.thumbnail) { map[i] = ["variables.thumbnail"]; i++; }
-        if (data.video)     { map[i] = ["variables.video"]; }
-        formData.append("map", JSON.stringify(map));
-
-        let idx = 0;
-        if (data.thumbnail) { formData.append(`${idx}`, data.thumbnail); idx++; }
-        if (data.video)     { formData.append(`${idx}`, data.video); }
-
-        return { url: "", method: "POST", body: formData };
+          variables: { id, input, thumbnail: null, video: null },
+        });
+ 
+        formData.append('operations', operations);
+ 
+        const map: Record<string, string[]> = {};
+        if (thumbnail) map['0'] = ['variables.thumbnail'];
+        if (video)     map['1'] = ['variables.video'];
+        formData.append('map', JSON.stringify(map));
+ 
+        if (thumbnail) formData.append('0', thumbnail);
+        if (video)     formData.append('1', video);
+ 
+        return { url: '', method: 'POST', body: formData };
       },
-      invalidatesTags: [{ type: "Content" as const, id: "LIST" }],
+      transformResponse: (response: any): ContentItem =>
+        response?.data?.updateContent ?? response?.updateContent,
+      // Invalidate both the specific item and the whole list
+      invalidatesTags: (_result, _err, { id }) => [{ type: 'Content', id }, 'Content'],
     }),
+ 
 
 
     // DELETE CONTENT 

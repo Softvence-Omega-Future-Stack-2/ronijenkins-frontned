@@ -11,23 +11,21 @@ export const UserStatus = {
   UNVERIFIED: 'UNVERIFIED',
 } as const;
 
-// এটি আপনার আগের UserStatus টাইপের মতোই কাজ করবে
+
 export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus];
 
 export default function UserProfileDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   
-  
-  // ১. সব ইউজার গেট করুন
+
   const { data: allUsersData, isLoading: isListLoading } = useGetAllUsersQuery({});
-  const [changeStatus, { isLoading: isStatusUpdating }] = useChangeUserStatusMutation();
+  const [, { isLoading: isStatusUpdating }] = useChangeUserStatusMutation();
 
   const [imgError, setImgError] = useState<boolean>(false);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [reason, setReason] = useState("");
 
-  // ২. আইডি দিয়ে নির্দিষ্ট ইউজার ফিল্টার করুন
   const user = allUsersData?.data?.find((u: any) => u.id === id);
 
   if (isListLoading) return <div className="p-20 text-center font-bold">Loading...</div>;
@@ -38,17 +36,17 @@ export default function UserProfileDetail() {
 const handleStatusToggle = async () => {
   const nextStatus = isBlocked ? UserStatus.ACTIVE : UserStatus.BLOCKED;
   
-  const statusInput = {
-    userId: user.id,
-    status: nextStatus,
-    blockReason: !isBlocked ? reason : "Reactivated by admin",
-    notifyUser: true,
-    sendDataExport: false
-  };
+  // const statusInput = {
+  //   userId: user.id,
+  //   status: nextStatus,
+  //   blockReason: !isBlocked ? reason : "Reactivated by admin",
+  //   notifyUser: true,
+  //   sendDataExport: false
+  // };
 
   try {
-    // ১. unwrap() যোগ করা হয়েছে নিশ্চিত করতে
-    const res = await changeStatus(statusInput).unwrap();
+   
+    // const res = await changeStatus(statusInput).unwrap();
     
     // ২. সাকসেস মেসেজ
     toast.success(`User status updated to ${nextStatus}!`, {
@@ -75,7 +73,7 @@ const handleStatusToggle = async () => {
       <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-50">
         <div className="flex flex-col lg:flex-row gap-10">
           
-          {/* Avatar Logic: ইমেজ না থাকলে নামের প্রথম অক্ষর */}
+          
           <div className="flex flex-col items-center lg:items-start gap-4 lg:w-52 flex-shrink-0 lg:border-r border-gray-100">
             {!user.avatar || imgError ? (
               <div className="w-32 h-32 rounded-[40px] bg-[#9266901A] flex items-center justify-center text-[#926690] text-5xl font-black border border-[#92669033]">

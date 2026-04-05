@@ -1,17 +1,19 @@
-import React, { useState, } from 'react';
+import React, { useState } from 'react';
 import { ChevronDown, Plus, ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { RichTextEditor, VideoUpload, MeditationEditor } from './ContentEditors';
-import { useCreateContentMutation } from '../../redux/features/admin/content/contentApi';
+import { RichTextEditor, VideoUpload } from './ContentEditors';
+import {
+  useCreateContentMutation,
+  type CreateContentInput,
+  
+} from '../../redux/features/admin/content/contentApi';
 import { toast } from 'react-toastify';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-// type ContentType = 'Article' | 'Video' | 'Audio';
-type ContentType = 'Article' | 'Video' ;
 
+type ContentType = 'Article' | 'Video';
 
-// const typeOptions: ContentType[] = ['Article', 'Video', 'Audio'];
-const typeOptions: ContentType[] = ['Article', 'Video', ];
+const typeOptions: ContentType[] = ['Article', 'Video'];
+
 const categoryOptions = [
   'SYMPTOM_RELIEF', 'MENTAL_HEALTH', 'MEDICAL',
   'WELLNESS', 'FITNESS', 'SLEEP_DISTURBANCES',
@@ -19,18 +21,24 @@ const categoryOptions = [
 ];
 
 const categoryLabels: Record<string, string> = {
-  SYMPTOM_RELIEF: 'Symptom Relief',
-  MENTAL_HEALTH: 'Mental Health',
-  MEDICAL: 'Medical',
-  WELLNESS: 'Wellness',
-  FITNESS: 'Fitness',
-  SLEEP_DISTURBANCES: 'Sleep Disturbances',
-  MOOD_SWINGS: 'Mood Swings',
-  FATIGUE: 'Fatigue',
-  HEADACHES: 'Headaches',
+  SYMPTOM_RELIEF:    'Symptom Relief',
+  MENTAL_HEALTH:     'Mental Health',
+  MEDICAL:           'Medical',
+  WELLNESS:          'Wellness',
+  FITNESS:           'Fitness',
+  SLEEP_DISTURBANCES:'Sleep Disturbances',
+  MOOD_SWINGS:       'Mood Swings',
+  FATIGUE:           'Fatigue',
+  HEADACHES:         'Headaches',
 };
 
 
+const typeMap: Record<ContentType, 'ARTICLE' | 'VIDEO'> = {
+  Article: 'ARTICLE',
+  Video:   'VIDEO',
+};
+
+// ─── Dropdown ─────────────────────────────────────────────────────────────────
 function Dropdown<T extends string>({
   label, value, options, labelMap, onChange,
 }: {
@@ -43,7 +51,9 @@ function Dropdown<T extends string>({
   const [open, setOpen] = useState(false);
   return (
     <div className="space-y-2 relative">
-      <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">{label}</label>
+      <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+        {label}
+      </label>
       <div
         className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 flex justify-between items-center cursor-pointer"
         onClick={() => setOpen(!open)}
@@ -54,8 +64,11 @@ function Dropdown<T extends string>({
       {open && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-borderColor rounded-xl shadow-md">
           {options.map((o) => (
-            <div key={o} onClick={() => { onChange(o); setOpen(false); }}
-              className="p-3 hover:bg-[#F2F1EE] cursor-pointer text-sm">
+            <div
+              key={o}
+              onClick={() => { onChange(o); setOpen(false); }}
+              className="p-3 hover:bg-[#F2F1EE] cursor-pointer text-sm"
+            >
               {labelMap ? labelMap[o] ?? o : o}
             </div>
           ))}
@@ -65,46 +78,28 @@ function Dropdown<T extends string>({
   );
 }
 
-
+// ─── Main Form ────────────────────────────────────────────────────────────────
 const CreateContentForm: React.FC = () => {
   const navigate = useNavigate();
   const [createContent, { isLoading: isSaving }] = useCreateContentMutation();
 
   // Basic fields
-  const [title, setTitle] = useState('');
-  const [seoDescription, setSeoDescription] = useState('');
-  const [readTime, setReadTime] = useState(5);
-  const [isPublished, setIsPublished] = useState(true);
-  const [notifyUsers, setNotifyUsers] = useState(true);
-  const [isLocked, setIsLocked] = useState(false);
-  const [typeSelected, setTypeSelected] = useState<ContentType>('Article');
+  const [title, setTitle]                       = useState('');
+  const [seoDescription, setSeoDescription]     = useState('');
+  const [readTime, setReadTime]                 = useState(5);
+  const [isPublished, setIsPublished]           = useState(true);
+  const [notifyUsers, setNotifyUsers]           = useState(true);
+  const [isLocked, setIsLocked]                 = useState(false);
+  const [typeSelected, setTypeSelected]         = useState<ContentType>('Article');
   const [categorySelected, setCategorySelected] = useState('SYMPTOM_RELIEF');
 
-  // Cover image
-  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
-  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
+  // Files
+  const [coverImageFile, setCoverImageFile]         = useState<File | null>(null);
+  const [coverImagePreview, setCoverImagePreview]   = useState<string | null>(null);
+  const [, setArticleBody]               = useState('');
+  const [videoFile, setVideoFile]                   = useState<File | null>(null);
 
-  // Article
-  const [articleBody, setArticleBody] = useState('');
-
-  // Video
-  const [videoFile, setVideoFile] = useState<File | null>(null);
-
-  // Audio/Meditation
-  const [meditationData, setMeditationData] = useState<{
-    steps: any[];
-    audioUrl: string | null;
-    audioFileName: string | null;
-    bgMusicUrl: string | null;
-    bgMusicFileName: string | null;
-    audioFile?: File | null;
-  }>({
-    steps: [{ id: 1, instruction: '', duration: 30 }],
-    audioUrl: null, audioFileName: null,
-    bgMusicUrl: null, bgMusicFileName: null,
-  });
-
-  
+  // ─── Handlers ────────────────────────────────────────────────────────────────
   const handleCoverImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -113,112 +108,127 @@ const CreateContentForm: React.FC = () => {
     }
   };
 
+  const generateSlug = (text: string) =>
+    text.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+
   const handleSave = async () => {
-     if (!title.trim()) {
-    toast.error('Title is required!', { position: 'top-right' });
-    return;
-  }
- 
-  
-  // ✅ এটা add করেন
-  console.log("📤 Sending:", { 
-    input: { name: title, type: [typeSelected], status: isPublished ? 'PUBLISHED' : 'DRAFT' },
-    thumbnail: coverImageFile ? `File: ${coverImageFile.name}` : null,
-    video: videoFile ? `File: ${videoFile.name}` : null,
-  });
+    // ── Validation ──────────────────────────────────────────────────────────
+    if (!title.trim()) {
+      toast.error('Title is required!', { position: 'top-right' });
+      return;
+    }
+    if (typeSelected === 'Video' && !videoFile) {
+      toast.error('Video file is required!', { position: 'top-right' });
+      return;
+    }
+
+    // ── Build input ─────────────────────────────────────────────────────────
+    // Explicitly typed as CreateContentInput so TypeScript treats
+    // status/type as literals, not plain `string`
+    const input: CreateContentInput = {
+      name:        title.trim(),
+      slug:        generateSlug(title),
+      description: seoDescription.trim() || '',
+      time:        Number(readTime),
+      status:      isPublished ? 'PUBLISHED' : 'DRAFT',  // ✅ literal
+      type:        typeMap[typeSelected],                  // ✅ literal
+      category:    categorySelected,
+      notify:      notifyUsers,
+      locked:      isLocked,
+    };
 
     const toastId = toast.loading('Creating content...', { position: 'top-right' });
 
-
     try {
-      // Map type to server enum
-      const typeMap: Record<ContentType, string> = {
-        Article: 'ARTICLE',
-        Video: 'VIDEO',
-        // Audio: 'AUDIO',
-      };
+      await createContent({
+        input,
+        thumbnail: coverImageFile,
+        video:     typeSelected === 'Video' ? videoFile : null,
+      }).unwrap();
 
-const input = {
-  name: title,
-  description: seoDescription || "",
-  time: Number(readTime),
-  status: isPublished ? 'PUBLISHED' : 'DRAFT',
-  type: typeSelected.toUpperCase(),// এটি নিশ্চিতভাবে 'ARTICLE', 'VIDEO' অথবা 'AUDIO' স্ট্রিং পাঠাবে
-  category: categorySelected,
-  notify: notifyUsers,
-  locked: isLocked,
-};
-console.log("🚀 Final Check before API call:", JSON.stringify(input));
-// console এ চেক করুন type কি আসে
-console.log("🚀 Corrected Input:", input);
-
-
-await createContent({
-  input,
-  thumbnail: coverImageFile,
-  video: typeSelected === 'Video' ? videoFile : null,
-}).unwrap();
-   
       toast.update(toastId, {
-        render: 'Content created successfully!',
+        render: 'Content created successfully! 🎉',
         type: 'success',
         isLoading: false,
         autoClose: 3000,
-        position: 'top-right',
       });
 
       navigate('/dashboard/content-cms');
     } catch (err: any) {
-      console.error('Create content error:', err);
+      console.error('❌ createContent error:', err);
+
+      const errorMessage =
+        err?.data?.errors?.[0]?.message ||
+        err?.data?.message ||
+        err?.error ||
+        'Failed to create content.';
+
       toast.update(toastId, {
-        render: err?.data?.errors?.[0]?.message || 'Failed to create content.',
+        render: errorMessage,
         type: 'error',
         isLoading: false,
         autoClose: 3000,
-        position: 'top-right',
       });
     }
-
-    
   };
 
+  // ─── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-[#FDFBF9] p-4 md:p-8 font-sans text-[#4A4A4A]">
 
-      <button onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-[#8B6E91] uppercase mb-6 hover:opacity-70 transition-opacity">
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-[#8B6E91] uppercase mb-6 hover:opacity-70 transition-opacity"
+      >
         <ChevronLeft size={14} strokeWidth={3} /> Back to Content Manager
       </button>
 
       <div className="max-w-7xl mx-auto bg-white rounded-[40px] shadow-sm border border-gray-100 p-8 md:p-12">
 
-        {/* Header */}
+        {/* ── Header ── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
           <div>
-            <h1 className="text-titleColor text-xl sm:text-2xl md:text-[30px] font-extrabold leading-6 md:leading-[36px]">Create New Content</h1>
-            <p className="text-subTitleColor text-sm font-medium leading-5 mt-0.5">Publishing to Global Library</p>
+            <h1 className="text-titleColor text-xl sm:text-2xl md:text-[30px] font-extrabold leading-6 md:leading-[36px]">
+              Create New Content
+            </h1>
+            <p className="text-subTitleColor text-sm font-medium leading-5 mt-0.5">
+              Publishing to Global Library
+            </p>
           </div>
           {/* Published toggle */}
           <div className="flex items-center gap-3">
-            <span className={`text-[10px] font-bold px-4 py-1.5 rounded-full transition-all ${!isPublished ? 'bg-[#FAF7F5] border border-borderColor text-[#8B6E91]' : 'text-gray-400'}`}>DRAFT</span>
-            <button onClick={() => setIsPublished(!isPublished)}
-              className={`relative w-12 h-6 rounded-full transition-colors ${isPublished ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}>
+            <span className={`text-[10px] font-bold px-4 py-1.5 rounded-full transition-all ${!isPublished ? 'bg-[#FAF7F5] border border-borderColor text-[#8B6E91]' : 'text-gray-400'}`}>
+              DRAFT
+            </span>
+            <button
+              onClick={() => setIsPublished(!isPublished)}
+              className={`relative w-12 h-6 rounded-full transition-colors ${isPublished ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
+            >
               <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${isPublished ? 'translate-x-6' : 'translate-x-0'}`} />
             </button>
-            <span className={`text-[10px] font-extrabold px-4 py-1.5 rounded-full transition-all ${isPublished ? 'text-buttonColor' : 'text-gray-400'}`}>PUBLISHED</span>
+            <span className={`text-[10px] font-extrabold px-4 py-1.5 rounded-full transition-all ${isPublished ? 'text-buttonColor' : 'text-gray-400'}`}>
+              PUBLISHED
+            </span>
           </div>
         </div>
 
-        {/* Top Form Grid */}
+        {/* ── Top Form Grid ── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8 border-b border-borderColor pb-10">
-          <div className="space-y-6">
 
+          {/* Left column */}
+          <div className="space-y-6">
             {/* Title */}
             <div className="space-y-2">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">Content Title *</label>
-              <input type="text" value={title} onChange={(e) => setTitle(e.target.value)}
+              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+                Content Title *
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Navigating Perimenopause Sleep"
-                className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 focus:ring-2 focus:ring-[#8B6E91]/20 outline-none placeholder:text-gray-300" />
+                className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 focus:ring-2 focus:ring-[#8B6E91]/20 outline-none placeholder:text-gray-300"
+              />
             </div>
 
             {/* Type & Category */}
@@ -240,51 +250,77 @@ await createContent({
 
             {/* Cover Image */}
             <div className="space-y-2">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">Cover Image / Thumbnail</label>
+              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+                Cover Image / Thumbnail
+              </label>
               <div className="w-full aspect-video bg-[#FAF7F5] border border-borderColor rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:bg-[#F2F1EE] transition-colors relative group overflow-hidden">
                 {coverImagePreview
                   ? <img src={coverImagePreview} alt="Preview" className="w-full h-full object-cover" />
                   : <>
                       <Plus className="text-gray-300 mb-2 group-hover:scale-110 transition-transform" size={32} />
-                      <span className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">Upload Thumbnail</span>
+                      <span className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+                        Upload Thumbnail
+                      </span>
                     </>
                 }
-                <input type="file" accept="image/*" onChange={handleCoverImage}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCoverImage}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
               </div>
             </div>
           </div>
 
+          {/* Right column */}
           <div className="space-y-6">
             {/* SEO Description */}
             <div className="space-y-2">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">SEO Description</label>
-              <textarea value={seoDescription} onChange={(e) => setSeoDescription(e.target.value)}
+              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+                SEO Description
+              </label>
+              <textarea
+                value={seoDescription}
+                onChange={(e) => setSeoDescription(e.target.value)}
                 placeholder="Short summary for search results..."
-                className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 h-[140px] focus:ring-2 focus:ring-[#8B6E91]/20 outline-none resize-none placeholder:text-gray-300" />
+                className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 h-[140px] focus:ring-2 focus:ring-[#8B6E91]/20 outline-none resize-none placeholder:text-gray-300"
+              />
             </div>
 
             {/* Read Time */}
             <div className="space-y-2">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">Read/Watch Time (Mins)</label>
-              <input type="number" value={readTime} onChange={(e) => setReadTime(Number(e.target.value))}
-                className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 focus:ring-2 focus:ring-[#8B6E91]/20 outline-none" />
+              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+                Read/Watch Time (Mins)
+              </label>
+              <input
+                type="number"
+                value={readTime}
+                onChange={(e) => setReadTime(Number(e.target.value))}
+                className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 focus:ring-2 focus:ring-[#8B6E91]/20 outline-none"
+              />
             </div>
 
             {/* Publishing Logic */}
             <div className="bg-[#FAF7F5] border border-borderColor rounded-3xl p-4 md:p-6 space-y-4">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[1px] text-buttonColor uppercase">Publishing Logic</label>
+              <label className="text-[10px] font-extrabold leading-4 tracking-[1px] text-buttonColor uppercase">
+                Publishing Logic
+              </label>
               <div className="flex justify-between items-center mt-4">
                 <span className="text-sm text-[#4A3A3799]">Notify Users?</span>
-                <button onClick={() => setNotifyUsers(!notifyUsers)}
-                  className={`relative w-10 h-5 rounded-full transition-colors ${notifyUsers ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}>
+                <button
+                  onClick={() => setNotifyUsers(!notifyUsers)}
+                  className={`relative w-10 h-5 rounded-full transition-colors ${notifyUsers ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
+                >
                   <div className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${notifyUsers ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-[#4A3A3799]">Locked content?</span>
-                <button onClick={() => setIsLocked(!isLocked)}
-                  className={`relative w-10 h-5 rounded-full transition-colors ${isLocked ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}>
+                <button
+                  onClick={() => setIsLocked(!isLocked)}
+                  className={`relative w-10 h-5 rounded-full transition-colors ${isLocked ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
+                >
                   <div className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${isLocked ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
@@ -292,48 +328,40 @@ await createContent({
           </div>
         </div>
 
-        {/* Dynamic Content Section */}
+        {/* ── Dynamic Content Section ── */}
         <div className="mt-10">
           {typeSelected === 'Article' && (
             <div className="space-y-3">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase block">Article Body</label>
+              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase block">
+                Article Body
+              </label>
               <RichTextEditor onChange={setArticleBody} />
             </div>
           )}
 
           {typeSelected === 'Video' && (
             <div className="space-y-3">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase block">Upload Video File</label>
-              <VideoUpload
-                onVideoChange={(file) => setVideoFile(file ?? null)}
-              />
+              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase block">
+                Upload Video File
+              </label>
+              <VideoUpload onVideoChange={(file) => setVideoFile(file ?? null)} />
             </div>
           )}
-
-          {/* {typeSelected === 'Audio' && (
-            <div className="space-y-3">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase block">Meditation Content</label>
-              <MeditationEditor
-                onChange={(data) => setMeditationData({
-                  steps: data.steps,
-                  audioUrl: data.audioUrl,
-                  audioFileName: data.audioFileName,
-                  bgMusicUrl: data.bgMusicUrl,
-                  bgMusicFileName: data.bgMusicFileName,
-                })}
-              />
-            </div>
-          )} */}
         </div>
 
-        {/* Footer Buttons */}
+        {/* ── Footer Buttons ── */}
         <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button onClick={() => navigate(-1)}
-            className="flex-1 bg-[#FDFBF9] border border-borderColor text-[#D0021B] font-black uppercase tracking-widest py-5 rounded-[24px] hover:bg-red-50 transition-colors cursor-pointer">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex-1 bg-[#FDFBF9] border border-borderColor text-[#D0021B] font-black uppercase tracking-widest py-5 rounded-[24px] hover:bg-red-50 transition-colors cursor-pointer"
+          >
             Discard
           </button>
-          <button onClick={handleSave} disabled={isSaving}
-            className="flex-[1.5] bg-buttonColor text-white font-black uppercase tracking-widest py-5 rounded-[24px] hover:opacity-90 transition-opacity shadow-lg shadow-[#8B6E91]/20 cursor-pointer disabled:opacity-70">
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="flex-[1.5] bg-buttonColor text-white font-black uppercase tracking-widest py-5 rounded-[24px] hover:opacity-90 transition-opacity shadow-lg shadow-[#8B6E91]/20 cursor-pointer disabled:opacity-70"
+          >
             {isSaving ? 'Saving...' : 'Save'}
           </button>
         </div>
@@ -344,9 +372,6 @@ await createContent({
 };
 
 export default CreateContentForm;
-
-
-
 
 
 // import React, { useState } from 'react';
