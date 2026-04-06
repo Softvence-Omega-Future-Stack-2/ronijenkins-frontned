@@ -1,377 +1,377 @@
-import React, { useState } from 'react';
-import { ChevronDown, Plus, ChevronLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { RichTextEditor, VideoUpload } from './ContentEditors';
-import {
-  useCreateContentMutation,
-  type CreateContentInput,
+// import React, { useState } from 'react';
+// import { ChevronDown, Plus, ChevronLeft } from 'lucide-react';
+// import { useNavigate } from 'react-router-dom';
+// import { RichTextEditor, VideoUpload } from './ContentEditors';
+// import {
+//   useCreateContentMutation,
+//   type CreateContentInput,
   
-} from '../../redux/features/admin/content/contentApi';
-import { toast } from 'react-toastify';
+// } from '../../redux/features/admin/content/contentApi';
+// import { toast } from 'react-toastify';
 
 
-type ContentType = 'Article' | 'Video';
+// type ContentType = 'Article' | 'Video';
 
-const typeOptions: ContentType[] = ['Article', 'Video'];
+// const typeOptions: ContentType[] = ['Article', 'Video'];
 
-const categoryOptions = [
-  'SYMPTOM_RELIEF', 'MENTAL_HEALTH', 'MEDICAL',
-  'WELLNESS', 'FITNESS', 'SLEEP_DISTURBANCES',
-  'MOOD_SWINGS', 'FATIGUE', 'HEADACHES',
-];
+// const categoryOptions = [
+//   'SYMPTOM_RELIEF', 'MENTAL_HEALTH', 'MEDICAL',
+//   'WELLNESS', 'FITNESS', 'SLEEP_DISTURBANCES',
+//   'MOOD_SWINGS', 'FATIGUE', 'HEADACHES',
+// ];
 
-const categoryLabels: Record<string, string> = {
-  SYMPTOM_RELIEF:    'Symptom Relief',
-  MENTAL_HEALTH:     'Mental Health',
-  MEDICAL:           'Medical',
-  WELLNESS:          'Wellness',
-  FITNESS:           'Fitness',
-  SLEEP_DISTURBANCES:'Sleep Disturbances',
-  MOOD_SWINGS:       'Mood Swings',
-  FATIGUE:           'Fatigue',
-  HEADACHES:         'Headaches',
-};
+// const categoryLabels: Record<string, string> = {
+//   SYMPTOM_RELIEF:    'Symptom Relief',
+//   MENTAL_HEALTH:     'Mental Health',
+//   MEDICAL:           'Medical',
+//   WELLNESS:          'Wellness',
+//   FITNESS:           'Fitness',
+//   SLEEP_DISTURBANCES:'Sleep Disturbances',
+//   MOOD_SWINGS:       'Mood Swings',
+//   FATIGUE:           'Fatigue',
+//   HEADACHES:         'Headaches',
+// };
 
 
-const typeMap: Record<ContentType, 'ARTICLE' | 'VIDEO'> = {
-  Article: 'ARTICLE',
-  Video:   'VIDEO',
-};
+// const typeMap: Record<ContentType, 'ARTICLE' | 'VIDEO'> = {
+//   Article: 'ARTICLE',
+//   Video:   'VIDEO',
+// };
 
-// ─── Dropdown ─────────────────────────────────────────────────────────────────
-function Dropdown<T extends string>({
-  label, value, options, labelMap, onChange,
-}: {
-  label: string;
-  value: T;
-  options: T[];
-  labelMap?: Record<string, string>;
-  onChange: (v: T) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="space-y-2 relative">
-      <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
-        {label}
-      </label>
-      <div
-        className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 flex justify-between items-center cursor-pointer"
-        onClick={() => setOpen(!open)}
-      >
-        <span>{labelMap ? labelMap[value] ?? value : value}</span>
-        <ChevronDown className={`transition-transform ${open ? 'rotate-180' : ''}`} size={18} />
-      </div>
-      {open && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-borderColor rounded-xl shadow-md">
-          {options.map((o) => (
-            <div
-              key={o}
-              onClick={() => { onChange(o); setOpen(false); }}
-              className="p-3 hover:bg-[#F2F1EE] cursor-pointer text-sm"
-            >
-              {labelMap ? labelMap[o] ?? o : o}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+// // ─── Dropdown ─────────────────────────────────────────────────────────────────
+// function Dropdown<T extends string>({
+//   label, value, options, labelMap, onChange,
+// }: {
+//   label: string;
+//   value: T;
+//   options: T[];
+//   labelMap?: Record<string, string>;
+//   onChange: (v: T) => void;
+// }) {
+//   const [open, setOpen] = useState(false);
+//   return (
+//     <div className="space-y-2 relative">
+//       <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+//         {label}
+//       </label>
+//       <div
+//         className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 flex justify-between items-center cursor-pointer"
+//         onClick={() => setOpen(!open)}
+//       >
+//         <span>{labelMap ? labelMap[value] ?? value : value}</span>
+//         <ChevronDown className={`transition-transform ${open ? 'rotate-180' : ''}`} size={18} />
+//       </div>
+//       {open && (
+//         <div className="absolute z-10 w-full mt-1 bg-white border border-borderColor rounded-xl shadow-md">
+//           {options.map((o) => (
+//             <div
+//               key={o}
+//               onClick={() => { onChange(o); setOpen(false); }}
+//               className="p-3 hover:bg-[#F2F1EE] cursor-pointer text-sm"
+//             >
+//               {labelMap ? labelMap[o] ?? o : o}
+//             </div>
+//           ))}
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
 
-// ─── Main Form ────────────────────────────────────────────────────────────────
-const CreateContentForm: React.FC = () => {
-  const navigate = useNavigate();
-  const [createContent, { isLoading: isSaving }] = useCreateContentMutation();
+// // ─── Main Form ────────────────────────────────────────────────────────────────
+// const CreateContentForm: React.FC = () => {
+//   const navigate = useNavigate();
+//   const [createContent, { isLoading: isSaving }] = useCreateContentMutation();
 
-  // Basic fields
-  const [title, setTitle]                       = useState('');
-  const [seoDescription, setSeoDescription]     = useState('');
-  const [readTime, setReadTime]                 = useState(5);
-  const [isPublished, setIsPublished]           = useState(true);
-  const [notifyUsers, setNotifyUsers]           = useState(true);
-  const [isLocked, setIsLocked]                 = useState(false);
-  const [typeSelected, setTypeSelected]         = useState<ContentType>('Article');
-  const [categorySelected, setCategorySelected] = useState('SYMPTOM_RELIEF');
+//   // Basic fields
+//   const [title, setTitle]                       = useState('');
+//   const [seoDescription, setSeoDescription]     = useState('');
+//   const [readTime, setReadTime]                 = useState(5);
+//   const [isPublished, setIsPublished]           = useState(true);
+//   const [notifyUsers, setNotifyUsers]           = useState(true);
+//   const [isLocked, setIsLocked]                 = useState(false);
+//   const [typeSelected, setTypeSelected]         = useState<ContentType>('Article');
+//   const [categorySelected, setCategorySelected] = useState('SYMPTOM_RELIEF');
 
-  // Files
-  const [coverImageFile, setCoverImageFile]         = useState<File | null>(null);
-  const [coverImagePreview, setCoverImagePreview]   = useState<string | null>(null);
-  const [, setArticleBody]               = useState('');
-  const [videoFile, setVideoFile]                   = useState<File | null>(null);
+//   // Files
+//   const [coverImageFile, setCoverImageFile]         = useState<File | null>(null);
+//   const [coverImagePreview, setCoverImagePreview]   = useState<string | null>(null);
+//   const [, setArticleBody]               = useState('');
+//   const [videoFile, setVideoFile]                   = useState<File | null>(null);
 
-  // ─── Handlers ────────────────────────────────────────────────────────────────
-  const handleCoverImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setCoverImageFile(file);
-      setCoverImagePreview(URL.createObjectURL(file));
-    }
-  };
+//   // ─── Handlers ────────────────────────────────────────────────────────────────
+//   const handleCoverImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     if (file) {
+//       setCoverImageFile(file);
+//       setCoverImagePreview(URL.createObjectURL(file));
+//     }
+//   };
 
-  const generateSlug = (text: string) =>
-    text.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+//   const generateSlug = (text: string) =>
+//     text.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
-  const handleSave = async () => {
-    // ── Validation ──────────────────────────────────────────────────────────
-    if (!title.trim()) {
-      toast.error('Title is required!', { position: 'top-right' });
-      return;
-    }
-    if (typeSelected === 'Video' && !videoFile) {
-      toast.error('Video file is required!', { position: 'top-right' });
-      return;
-    }
+//   const handleSave = async () => {
+//     // ── Validation ──────────────────────────────────────────────────────────
+//     if (!title.trim()) {
+//       toast.error('Title is required!', { position: 'top-right' });
+//       return;
+//     }
+//     if (typeSelected === 'Video' && !videoFile) {
+//       toast.error('Video file is required!', { position: 'top-right' });
+//       return;
+//     }
 
-    // ── Build input ─────────────────────────────────────────────────────────
-    // Explicitly typed as CreateContentInput so TypeScript treats
-    // status/type as literals, not plain `string`
-    const input: CreateContentInput = {
-      name:        title.trim(),
-      slug:        generateSlug(title),
-      description: seoDescription.trim() || '',
-      time:        Number(readTime),
-      status:      isPublished ? 'PUBLISHED' : 'DRAFT',  // ✅ literal
-      type:        typeMap[typeSelected],                  // ✅ literal
-      category:    categorySelected,
-      notify:      notifyUsers,
-      locked:      isLocked,
-    };
+//     // ── Build input ─────────────────────────────────────────────────────────
+//     // Explicitly typed as CreateContentInput so TypeScript treats
+//     // status/type as literals, not plain `string`
+//     const input: CreateContentInput = {
+//       name:        title.trim(),
+//       slug:        generateSlug(title),
+//       description: seoDescription.trim() || '',
+//       time:        Number(readTime),
+//       status:      isPublished ? 'PUBLISHED' : 'DRAFT',  // ✅ literal
+//       type:        typeMap[typeSelected],                  // ✅ literal
+//       category:    categorySelected,
+//       notify:      notifyUsers,
+//       locked:      isLocked,
+//     };
 
-    const toastId = toast.loading('Creating content...', { position: 'top-right' });
+//     const toastId = toast.loading('Creating content...', { position: 'top-right' });
 
-    try {
-      await createContent({
-        input,
-        thumbnail: coverImageFile,
-        video:     typeSelected === 'Video' ? videoFile : null,
-      }).unwrap();
+//     try {
+//       await createContent({
+//         input,
+//         thumbnail: coverImageFile,
+//         video:     typeSelected === 'Video' ? videoFile : null,
+//       }).unwrap();
 
-      toast.update(toastId, {
-        render: 'Content created successfully! 🎉',
-        type: 'success',
-        isLoading: false,
-        autoClose: 3000,
-      });
+//       toast.update(toastId, {
+//         render: 'Content created successfully! 🎉',
+//         type: 'success',
+//         isLoading: false,
+//         autoClose: 3000,
+//       });
 
-      navigate('/dashboard/content-cms');
-    } catch (err: any) {
-      console.error('❌ createContent error:', err);
+//       navigate('/dashboard/content-cms');
+//     } catch (err: any) {
+//       console.error('❌ createContent error:', err);
 
-      const errorMessage =
-        err?.data?.errors?.[0]?.message ||
-        err?.data?.message ||
-        err?.error ||
-        'Failed to create content.';
+//       const errorMessage =
+//         err?.data?.errors?.[0]?.message ||
+//         err?.data?.message ||
+//         err?.error ||
+//         'Failed to create content.';
 
-      toast.update(toastId, {
-        render: errorMessage,
-        type: 'error',
-        isLoading: false,
-        autoClose: 3000,
-      });
-    }
-  };
+//       toast.update(toastId, {
+//         render: errorMessage,
+//         type: 'error',
+//         isLoading: false,
+//         autoClose: 3000,
+//       });
+//     }
+//   };
 
-  // ─── Render ──────────────────────────────────────────────────────────────────
-  return (
-    <div className="min-h-screen bg-[#FDFBF9] p-4 md:p-8 font-sans text-[#4A4A4A]">
+//   // ─── Render ──────────────────────────────────────────────────────────────────
+//   return (
+//     <div className="min-h-screen bg-[#FDFBF9] p-4 md:p-8 font-sans text-[#4A4A4A]">
 
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-[#8B6E91] uppercase mb-6 hover:opacity-70 transition-opacity"
-      >
-        <ChevronLeft size={14} strokeWidth={3} /> Back to Content Manager
-      </button>
+//       <button
+//         onClick={() => navigate(-1)}
+//         className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-[#8B6E91] uppercase mb-6 hover:opacity-70 transition-opacity"
+//       >
+//         <ChevronLeft size={14} strokeWidth={3} /> Back to Content Manager
+//       </button>
 
-      <div className="max-w-7xl mx-auto bg-white rounded-[40px] shadow-sm border border-gray-100 p-8 md:p-12">
+//       <div className="max-w-7xl mx-auto bg-white rounded-[40px] shadow-sm border border-gray-100 p-8 md:p-12">
 
-        {/* ── Header ── */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
-          <div>
-            <h1 className="text-titleColor text-xl sm:text-2xl md:text-[30px] font-extrabold leading-6 md:leading-[36px]">
-              Create New Content
-            </h1>
-            <p className="text-subTitleColor text-sm font-medium leading-5 mt-0.5">
-              Publishing to Global Library
-            </p>
-          </div>
-          {/* Published toggle */}
-          <div className="flex items-center gap-3">
-            <span className={`text-[10px] font-bold px-4 py-1.5 rounded-full transition-all ${!isPublished ? 'bg-[#FAF7F5] border border-borderColor text-[#8B6E91]' : 'text-gray-400'}`}>
-              DRAFT
-            </span>
-            <button
-              onClick={() => setIsPublished(!isPublished)}
-              className={`relative w-12 h-6 rounded-full transition-colors ${isPublished ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
-            >
-              <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${isPublished ? 'translate-x-6' : 'translate-x-0'}`} />
-            </button>
-            <span className={`text-[10px] font-extrabold px-4 py-1.5 rounded-full transition-all ${isPublished ? 'text-buttonColor' : 'text-gray-400'}`}>
-              PUBLISHED
-            </span>
-          </div>
-        </div>
+//         {/* ── Header ── */}
+//         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+//           <div>
+//             <h1 className="text-titleColor text-xl sm:text-2xl md:text-[30px] font-extrabold leading-6 md:leading-[36px]">
+//               Create New Content
+//             </h1>
+//             <p className="text-subTitleColor text-sm font-medium leading-5 mt-0.5">
+//               Publishing to Global Library
+//             </p>
+//           </div>
+//           {/* Published toggle */}
+//           <div className="flex items-center gap-3">
+//             <span className={`text-[10px] font-bold px-4 py-1.5 rounded-full transition-all ${!isPublished ? 'bg-[#FAF7F5] border border-borderColor text-[#8B6E91]' : 'text-gray-400'}`}>
+//               DRAFT
+//             </span>
+//             <button
+//               onClick={() => setIsPublished(!isPublished)}
+//               className={`relative w-12 h-6 rounded-full transition-colors ${isPublished ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
+//             >
+//               <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${isPublished ? 'translate-x-6' : 'translate-x-0'}`} />
+//             </button>
+//             <span className={`text-[10px] font-extrabold px-4 py-1.5 rounded-full transition-all ${isPublished ? 'text-buttonColor' : 'text-gray-400'}`}>
+//               PUBLISHED
+//             </span>
+//           </div>
+//         </div>
 
-        {/* ── Top Form Grid ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8 border-b border-borderColor pb-10">
+//         {/* ── Top Form Grid ── */}
+//         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8 border-b border-borderColor pb-10">
 
-          {/* Left column */}
-          <div className="space-y-6">
-            {/* Title */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
-                Content Title *
-              </label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Navigating Perimenopause Sleep"
-                className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 focus:ring-2 focus:ring-[#8B6E91]/20 outline-none placeholder:text-gray-300"
-              />
-            </div>
+//           {/* Left column */}
+//           <div className="space-y-6">
+//             {/* Title */}
+//             <div className="space-y-2">
+//               <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+//                 Content Title *
+//               </label>
+//               <input
+//                 type="text"
+//                 value={title}
+//                 onChange={(e) => setTitle(e.target.value)}
+//                 placeholder="e.g. Navigating Perimenopause Sleep"
+//                 className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 focus:ring-2 focus:ring-[#8B6E91]/20 outline-none placeholder:text-gray-300"
+//               />
+//             </div>
 
-            {/* Type & Category */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Dropdown
-                label="Type"
-                value={typeSelected}
-                options={typeOptions}
-                onChange={setTypeSelected}
-              />
-              <Dropdown
-                label="Category"
-                value={categorySelected}
-                options={categoryOptions}
-                labelMap={categoryLabels}
-                onChange={setCategorySelected}
-              />
-            </div>
+//             {/* Type & Category */}
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//               <Dropdown
+//                 label="Type"
+//                 value={typeSelected}
+//                 options={typeOptions}
+//                 onChange={setTypeSelected}
+//               />
+//               <Dropdown
+//                 label="Category"
+//                 value={categorySelected}
+//                 options={categoryOptions}
+//                 labelMap={categoryLabels}
+//                 onChange={setCategorySelected}
+//               />
+//             </div>
 
-            {/* Cover Image */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
-                Cover Image / Thumbnail
-              </label>
-              <div className="w-full aspect-video bg-[#FAF7F5] border border-borderColor rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:bg-[#F2F1EE] transition-colors relative group overflow-hidden">
-                {coverImagePreview
-                  ? <img src={coverImagePreview} alt="Preview" className="w-full h-full object-cover" />
-                  : <>
-                      <Plus className="text-gray-300 mb-2 group-hover:scale-110 transition-transform" size={32} />
-                      <span className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
-                        Upload Thumbnail
-                      </span>
-                    </>
-                }
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleCoverImage}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-              </div>
-            </div>
-          </div>
+//             {/* Cover Image */}
+//             <div className="space-y-2">
+//               <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+//                 Cover Image / Thumbnail
+//               </label>
+//               <div className="w-full aspect-video bg-[#FAF7F5] border border-borderColor rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:bg-[#F2F1EE] transition-colors relative group overflow-hidden">
+//                 {coverImagePreview
+//                   ? <img src={coverImagePreview} alt="Preview" className="w-full h-full object-cover" />
+//                   : <>
+//                       <Plus className="text-gray-300 mb-2 group-hover:scale-110 transition-transform" size={32} />
+//                       <span className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+//                         Upload Thumbnail
+//                       </span>
+//                     </>
+//                 }
+//                 <input
+//                   type="file"
+//                   accept="image/*"
+//                   onChange={handleCoverImage}
+//                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+//                 />
+//               </div>
+//             </div>
+//           </div>
 
-          {/* Right column */}
-          <div className="space-y-6">
-            {/* SEO Description */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
-                SEO Description
-              </label>
-              <textarea
-                value={seoDescription}
-                onChange={(e) => setSeoDescription(e.target.value)}
-                placeholder="Short summary for search results..."
-                className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 h-[140px] focus:ring-2 focus:ring-[#8B6E91]/20 outline-none resize-none placeholder:text-gray-300"
-              />
-            </div>
+//           {/* Right column */}
+//           <div className="space-y-6">
+//             {/* SEO Description */}
+//             <div className="space-y-2">
+//               <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+//                 SEO Description
+//               </label>
+//               <textarea
+//                 value={seoDescription}
+//                 onChange={(e) => setSeoDescription(e.target.value)}
+//                 placeholder="Short summary for search results..."
+//                 className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 h-[140px] focus:ring-2 focus:ring-[#8B6E91]/20 outline-none resize-none placeholder:text-gray-300"
+//               />
+//             </div>
 
-            {/* Read Time */}
-            <div className="space-y-2">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
-                Read/Watch Time (Mins)
-              </label>
-              <input
-                type="number"
-                value={readTime}
-                onChange={(e) => setReadTime(Number(e.target.value))}
-                className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 focus:ring-2 focus:ring-[#8B6E91]/20 outline-none"
-              />
-            </div>
+//             {/* Read Time */}
+//             <div className="space-y-2">
+//               <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+//                 Read/Watch Time (Mins)
+//               </label>
+//               <input
+//                 type="number"
+//                 value={readTime}
+//                 onChange={(e) => setReadTime(Number(e.target.value))}
+//                 className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 focus:ring-2 focus:ring-[#8B6E91]/20 outline-none"
+//               />
+//             </div>
 
-            {/* Publishing Logic */}
-            <div className="bg-[#FAF7F5] border border-borderColor rounded-3xl p-4 md:p-6 space-y-4">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[1px] text-buttonColor uppercase">
-                Publishing Logic
-              </label>
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-sm text-[#4A3A3799]">Notify Users?</span>
-                <button
-                  onClick={() => setNotifyUsers(!notifyUsers)}
-                  className={`relative w-10 h-5 rounded-full transition-colors ${notifyUsers ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
-                >
-                  <div className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${notifyUsers ? 'translate-x-5' : 'translate-x-0'}`} />
-                </button>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-[#4A3A3799]">Locked content?</span>
-                <button
-                  onClick={() => setIsLocked(!isLocked)}
-                  className={`relative w-10 h-5 rounded-full transition-colors ${isLocked ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
-                >
-                  <div className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${isLocked ? 'translate-x-5' : 'translate-x-0'}`} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+//             {/* Publishing Logic */}
+//             <div className="bg-[#FAF7F5] border border-borderColor rounded-3xl p-4 md:p-6 space-y-4">
+//               <label className="text-[10px] font-extrabold leading-4 tracking-[1px] text-buttonColor uppercase">
+//                 Publishing Logic
+//               </label>
+//               <div className="flex justify-between items-center mt-4">
+//                 <span className="text-sm text-[#4A3A3799]">Notify Users?</span>
+//                 <button
+//                   onClick={() => setNotifyUsers(!notifyUsers)}
+//                   className={`relative w-10 h-5 rounded-full transition-colors ${notifyUsers ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
+//                 >
+//                   <div className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${notifyUsers ? 'translate-x-5' : 'translate-x-0'}`} />
+//                 </button>
+//               </div>
+//               <div className="flex justify-between items-center">
+//                 <span className="text-sm text-[#4A3A3799]">Locked content?</span>
+//                 <button
+//                   onClick={() => setIsLocked(!isLocked)}
+//                   className={`relative w-10 h-5 rounded-full transition-colors ${isLocked ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
+//                 >
+//                   <div className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${isLocked ? 'translate-x-5' : 'translate-x-0'}`} />
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
 
-        {/* ── Dynamic Content Section ── */}
-        <div className="mt-10">
-          {typeSelected === 'Article' && (
-            <div className="space-y-3">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase block">
-                Article Body
-              </label>
-              <RichTextEditor onChange={setArticleBody} />
-            </div>
-          )}
+//         {/* ── Dynamic Content Section ── */}
+//         <div className="mt-10">
+//           {typeSelected === 'Article' && (
+//             <div className="space-y-3">
+//               <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase block">
+//                 Article Body
+//               </label>
+//               <RichTextEditor onChange={setArticleBody} />
+//             </div>
+//           )}
 
-          {typeSelected === 'Video' && (
-            <div className="space-y-3">
-              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase block">
-                Upload Video File
-              </label>
-              <VideoUpload onVideoChange={(file) => setVideoFile(file ?? null)} />
-            </div>
-          )}
-        </div>
+//           {typeSelected === 'Video' && (
+//             <div className="space-y-3">
+//               <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase block">
+//                 Upload Video File
+//               </label>
+//               <VideoUpload onVideoChange={(file) => setVideoFile(file ?? null)} />
+//             </div>
+//           )}
+//         </div>
 
-        {/* ── Footer Buttons ── */}
-        <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex-1 bg-[#FDFBF9] border border-borderColor text-[#D0021B] font-black uppercase tracking-widest py-5 rounded-[24px] hover:bg-red-50 transition-colors cursor-pointer"
-          >
-            Discard
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="flex-[1.5] bg-buttonColor text-white font-black uppercase tracking-widest py-5 rounded-[24px] hover:opacity-90 transition-opacity shadow-lg shadow-[#8B6E91]/20 cursor-pointer disabled:opacity-70"
-          >
-            {isSaving ? 'Saving...' : 'Save'}
-          </button>
-        </div>
+//         {/* ── Footer Buttons ── */}
+//         <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+//           <button
+//             onClick={() => navigate(-1)}
+//             className="flex-1 bg-[#FDFBF9] border border-borderColor text-[#D0021B] font-black uppercase tracking-widest py-5 rounded-[24px] hover:bg-red-50 transition-colors cursor-pointer"
+//           >
+//             Discard
+//           </button>
+//           <button
+//             onClick={handleSave}
+//             disabled={isSaving}
+//             className="flex-[1.5] bg-buttonColor text-white font-black uppercase tracking-widest py-5 rounded-[24px] hover:opacity-90 transition-opacity shadow-lg shadow-[#8B6E91]/20 cursor-pointer disabled:opacity-70"
+//           >
+//             {isSaving ? 'Saving...' : 'Save'}
+//           </button>
+//         </div>
 
-      </div>
-    </div>
-  );
-};
+//       </div>
+//     </div>
+//   );
+// };
 
-export default CreateContentForm;
+// export default CreateContentForm;
 
 
 // import React, { useState } from 'react';
@@ -600,233 +600,330 @@ export default CreateContentForm;
 
 
 
-
-// import React, { useState } from 'react';
-// import { ChevronDown, Plus, ChevronLeft } from 'lucide-react';
-
-// const CreateContentForm: React.FC = () => {
-//   const [isPublished, setIsPublished] = useState(true);
-//   const [notifyUsers, setNotifyUsers] = useState(true);
-//   const [isLocked, setIsLocked] = useState(false);
-//   const [filePreview, setFilePreview] = useState<string | null>(null); // File preview
-
-//   const [typeOpen, setTypeOpen] = useState(false);
-//   const [typeSelected, setTypeSelected] = useState('Article');
-//   const typeOptions = ['Article', 'Video'];
-
-//   // Category dropdown
-//   const [categoryOpen, setCategoryOpen] = useState(false);
-//   const [categorySelected, setCategorySelected] = useState('Symptom Relief');
-//   const categoryOptions = ['Symptom Relief', 'Mental Health', 'Medical', 'Wellness', 'Fitness'];
+import React, { useState } from 'react';
+import { ChevronDown, Plus, ChevronLeft } from 'lucide-react';
+import { useCreateContentMutation } from '../../redux/features/admin/content/contentApi';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 
-//   return (
-//     <div className="min-h-screen bg-[#FDFBF9] p-4 md:p-8 font-sans text-[#4A4A4A]">
-//       {/* Back Button */}
-//       <button className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-[#8B6E91] uppercase mb-6 hover:opacity-70 transition-opacity">
-//         <ChevronLeft size={14} strokeWidth={3} /> Back to Content Manager
-//       </button>
+const CreateContentForm: React.FC = () => {
+  const [isPublished, setIsPublished] = useState(true);
+  const [notifyUsers, setNotifyUsers] = useState(true);
+  const [isLocked, setIsLocked] = useState(false);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [time, setTime] = useState(5);
+  const navigate = useNavigate()
 
-//       {/* Main Card */}
-//       <div className="max-w-7xl mx-auto bg-white rounded-[40px] shadow-sm border border-gray-100 p-8 md:p-12">
-//         {/* Header Section */}
-//         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
-//           <div>
-//             <h1 className="text-titleColor text-xl sm:text-2xl md:text-[30px] font-extrabold leading-6 md:leading-[36px]">
-//               Create New Content
-//             </h1>
-//             <p className="text-subTitleColor text-sm font-medium leading-5 mt-0.5">
-//               Publishing to Global Library • v1.0.4
-//             </p>
-//           </div>
+  const [typeOpen, setTypeOpen] = useState(false);
+  const [typeSelected, setTypeSelected] = useState('Article');
+  const typeOptions = ['Article', 'Video'];
 
-//           {/* Status Toggle */}
-//           <div className="flex items-center gap-3">
-//             <span className={`text-[10px] font-bold px-4 py-1.5 rounded-full transition-all ${!isPublished ? 'bg-[#FAF7F5] border border-borderColor text-[#8B6E91]' : 'text-gray-400'}`}>
-//               DRAFT
-//             </span>
-//             <button
-//               onClick={() => setIsPublished(!isPublished)}
-//               className={`relative w-12 h-6 rounded-full transition-colors ${isPublished ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
-//             >
-//               <div
-//                 className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${isPublished ? 'translate-x-6' : 'translate-x-0'}`}
-//               />
-//             </button>
-//             <span className={`text-[10px] font-extrabold px-4 py-1.5 rounded-full transition-all ${isPublished ? ' text-buttonColor' : 'text-gray-400'}`}>
-//               PUBLISHED
-//             </span>
-//           </div>
-//         </div>
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const categoryOptions = [
+  { label: 'Hot Flashes', value: 'HOT_FLASHES' },
+  { label: 'Night Sweats', value: 'NIGHT_SWEATS' },
+  { label: 'Mood Swings', value: 'MOOD_SWINGS' },
+  { label: 'Sleep Disturbances', value: 'SLEEP_DISTURBANCES' },
+  { label: 'Vaginal Dryness', value: 'VAGINAL_DRYNESS' },
+  { label: 'Irregular Periods', value: 'IRREGULAR_PERIODS' },
+  { label: 'Joint Pain', value: 'JOINT_PAIN' },
+  { label: 'Headaches', value: 'HEADACHES' },
+  { label: 'Fatigue', value: 'FATIGUE' },
+  { label: 'Memory Problems', value: 'MEMORY_PROBLEMS' },
+];
 
-//         {/* Form */}
-//         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8 border-b border-borderColor pb-13">
-//           {/* Left Column */}
-//           <div className="space-y-6">
-//             <div className="space-y-2">
-//               <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase ">
-//                 Content Title
-//               </label>
-//               <input
-//                 type="text"
-//                 placeholder="e.g. Navigating Perimenopause Sleep"
-//                 className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 focus:ring-2 focus:ring-[#8B6E91]/20 outline-none placeholder:text-gray-300"
-//               />
-//             </div>
+const [categorySelected, setCategorySelected] = useState(categoryOptions[0]);
 
-//            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//       {/* Type Dropdown */}
-//       <div className="space-y-2 relative">
-//         <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
-//           Type
-//         </label>
-//         <div
-//           className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 flex justify-between items-center cursor-pointer"
-//           onClick={() => setTypeOpen(!typeOpen)}
-//         >
-//           <span>{typeSelected}</span>
-//           <ChevronDown className={`transition-transform ${typeOpen ? 'rotate-180' : ''}`} size={18} />
-//         </div>
-//         {typeOpen && (
-//           <div className="absolute z-10 w-full mt-1 bg-white border border-borderColor rounded-xl shadow-md max-h-40 overflow-auto">
-//             {typeOptions.map((option) => (
-//               <div
-//                 key={option}
-//                 onClick={() => {
-//                   setTypeSelected(option);
-//                   setTypeOpen(false);
-//                 }}
-//                 className="p-3 hover:bg-[#F2F1EE] cursor-pointer"
-//               >
-//                 {option}
-//               </div>
-//             ))}
-//           </div>
-//         )}
-//       </div>
+  const [createContent, { isLoading, error }] = useCreateContentMutation();
 
-//       {/* Category Dropdown */}
-//       <div className="space-y-2 relative">
-//         <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
-//           Category
-//         </label>
-//         <div
-//           className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 flex justify-between items-center cursor-pointer"
-//           onClick={() => setCategoryOpen(!categoryOpen)}
-//         >
-//           <span>{categorySelected}</span>
-//           <ChevronDown className={`transition-transform ${categoryOpen ? 'rotate-180' : ''}`} size={18} />
-//         </div>
-//         {categoryOpen && (
-//           <div className="absolute z-10 w-full mt-1 bg-white border border-borderColor rounded-xl shadow-md max-h-40 overflow-auto">
-//             {categoryOptions.map((option) => (
-//               <div
-//                 key={option}
-//                 onClick={() => {
-//                   setCategorySelected(option);
-//                   setCategoryOpen(false);
-//                 }}
-//                 className="p-3 hover:bg-[#F2F1EE] cursor-pointer"
-//               >
-//                 {option}
-//               </div>
-//             ))}
-//           </div>
-//         )}
-//       </div>
-//     </div>
+  const handleSubmit = async () => {
+    if (!title.trim()) {
+      alert('Content title is required');
+      return;
+    }
+console.log('1. typeSelected:', typeSelected);
+  console.log('2. thumbnailFile:', thumbnailFile);
+  console.log('3. videoFile:', videoFile);
+    const fd = new FormData();
+    for (let [key, value] of fd.entries()) {
+    console.log('FormData entry:', key, value);
+  }
+    try {
+      const result = await createContent({
+        input: {
+          name: title.trim(),
+          description: description.trim() || null,
+          type: typeSelected === 'Video' ? 'VIDEO' : 'ARTICLE',
+          time: Number(time),
+          notify: notifyUsers,
+          locked: isLocked,
+          status: isPublished ? 'PUBLISHED' : 'DRAFT',
+          category: categorySelected.value,
+        },
+        thumbnail: thumbnailFile ?? null,
+        video: videoFile ?? null,
+      }).unwrap();
+      toast.success("Content Created Succesfull",{position:'top-right'})
+    navigate('/dashboard/content-cms')
+  
+      console.log('✅ Created:', result);
+      // success হলে reset করুন
+      setTitle('');
+      setDescription('');
+      setTime(5);
+      setThumbnailFile(null);
+      setVideoFile(null);
+      setFilePreview(null);
+      setIsPublished(true);
+      setNotifyUsers(true);
+      setIsLocked(false);
+    } catch (err: any) {
+  console.error('❌ createContent error:', err);
 
-//             <div className="space-y-2">
-//               <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
-//                 Cover Image / Thumbnail
-//               </label>
-//               <div className="w-full aspect-video bg-[#FAF7F5] border border-borderColor rounded-4xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-[#F2F1EE] transition-colors relative group overflow-hidden">
-//                 {filePreview ? (
-//                   <img src={filePreview} alt="Preview" className="w-full h-full object-cover rounded-4xl" />
-//                 ) : (
-//                   <>
-//                     <Plus className="text-gray-300 mb-2 group-hover:scale-110 transition-transform" size={32} />
-//                     <span className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">Upload Asset</span>
-//                   </>
-//                 )}
-//                 <input
-//                   type="file"
-//                   accept="image/*"
-//                   onChange={(e) => {
-//                     if (e.target.files && e.target.files[0]) {
-//                       const fileURL = URL.createObjectURL(e.target.files[0]);
-//                       setFilePreview(fileURL);
-//                     }
-//                   }}
-//                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-//                 />
-//               </div>
-//             </div>
-//           </div>
+  const errorMessage =
+    err?.message || "Something went wrong!";
 
-//           {/* Right Column */}
-//           <div className="space-y-6">
-//             <div className="space-y-2">
-//               <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
-//                 SEO Description
-//               </label>
-//               <textarea
-//                 placeholder="Short summary for search results..."
-//                 className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 h-[140px] focus:ring-2 focus:ring-[#8B6E91]/20 outline-none resize-none placeholder:text-gray-300"
-//               />
-//             </div>
+  toast.error(errorMessage, {
+    position: 'top-right',
+  });
+}
 
-//             <div className="space-y-2">
-//               <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
-//                 Read/Watch Time (Mins)
-//               </label>
-//               <input
-//                 type="number"
-//                 defaultValue={5}
-//                 className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 focus:ring-2 focus:ring-[#8B6E91]/20 outline-none"
-//               />
-//             </div>
+    ;
+  };
 
-//             <div className="bg-[#FAF7F5] border border-borderColor rounded-4xl p-4 md:p-6 space-y-4">
-//               <label className="text-[10px] font-extrabold leading-4 tracking-[1px] text-buttonColor uppercase mb-4">Publishing Logic</label>
-//               <div className="flex justify-between items-center mt-4">
-//                 <span className="text-sm text-[#4A3A3799] font-normal leading-4">Notify Users?</span>
-//                 <button
-//                   onClick={() => setNotifyUsers(!notifyUsers)}
-//                   className={`relative w-10 h-5 rounded-full transition-colors ${notifyUsers ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
-//                 >
-//                   <div
-//                     className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${notifyUsers ? 'translate-x-5' : 'translate-x-0'}`}
-//                   />
-//                 </button>
-//               </div>
-//               <div className="flex justify-between items-center">
-//                 <span className="text-sm text-[#4A3A3799] font-normal leading-4">Locked content?</span>
-//                 <button
-//                   onClick={() => setIsLocked(!isLocked)}
-//                   className={`relative w-10 h-5 rounded-full transition-colors ${isLocked ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
-//                 >
-//                   <div
-//                     className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${isLocked ? 'translate-x-5' : 'translate-x-0'}`}
-//                   />
-//                 </button>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
+  return (
+    <div className="min-h-screen bg-[#FDFBF9] p-4 md:p-8 font-sans text-[#4A4A4A]">
+      <button onClick={()=>navigate('/dashboard/content-cms')}  className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-[#8B6E91] uppercase mb-6 hover:opacity-70 transition-opacity cursor-pointer">
+        <ChevronLeft size={14} strokeWidth={3} /> Back to Content Manager
+      </button>
 
-//         {/* Footer Buttons */}
-//         <div className="mt-13 grid grid-cols-1 md:grid-cols-2 gap-4">
-//           <button className="flex-1 bg-[#FDFBF9] border border-borderColor text-[#D0021B] font-black uppercase tracking-widest py-5 rounded-[24px] hover:bg-red-50 transition-colors cursor-pointer">
-//             Discard
-//           </button>
-//           <button className="flex-[1.5] bg-buttonColor text-white font-black uppercase tracking-widest py-5 rounded-[24px] hover:opacity-90 transition-opacity shadow-lg shadow-[#8B6E91]/20 cursor-pointer">
-//             Save
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+      <div className="max-w-7xl mx-auto bg-white rounded-[40px] shadow-sm border border-gray-100 p-8 md:p-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+          <div>
+            <h1 className="text-titleColor text-xl sm:text-2xl md:text-[30px] font-extrabold leading-6 md:leading-[36px]">
+              Create New Content
+            </h1>
+            <p className="text-subTitleColor text-sm font-medium leading-5 mt-0.5">
+              Publishing to Global Library • v1.0.4
+            </p>
+          </div>
 
-// export default CreateContentForm;
+          <div className="flex items-center gap-3">
+            <span className={`text-[10px] font-bold px-4 py-1.5 rounded-full transition-all ${!isPublished ? 'bg-[#FAF7F5] border border-borderColor text-[#8B6E91]' : 'text-gray-400'}`}>
+              DRAFT
+            </span>
+            <button
+              onClick={() => setIsPublished(!isPublished)}
+              className={`relative w-12 h-6 rounded-full transition-colors ${isPublished ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
+            >
+              <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${isPublished ? 'translate-x-6' : 'translate-x-0'}`} />
+            </button>
+            <span className={`text-[10px] font-extrabold px-4 py-1.5 rounded-full transition-all ${isPublished ? 'text-buttonColor' : 'text-gray-400'}`}>
+              PUBLISHED
+            </span>
+          </div>
+        </div>
+
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-600 text-sm">
+            {'message' in (error as any) ? (error as any).message : 'Something went wrong. Please try again.'}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8 border-b border-borderColor pb-13">
+          {/* Left Column */}
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+                Content Title
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Navigating Perimenopause Sleep"
+                className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 focus:ring-2 focus:ring-[#8B6E91]/20 outline-none placeholder:text-gray-300"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2 relative">
+                <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+                  Type
+                </label>
+                <div
+                  className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 flex justify-between items-center cursor-pointer"
+                  onClick={() => setTypeOpen(!typeOpen)}
+                >
+                  <span>{typeSelected}</span>
+                  <ChevronDown className={`transition-transform ${typeOpen ? 'rotate-180' : ''}`} size={18} />
+                </div>
+                {typeOpen && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-borderColor rounded-xl shadow-md max-h-40 overflow-auto">
+                    {typeOptions.map((option) => (
+                      <div
+                        key={option}
+                        onClick={() => { setTypeSelected(option); setTypeOpen(false); }}
+                        className="p-3 hover:bg-[#F2F1EE] cursor-pointer"
+                      >
+                        {option}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2 relative">
+                <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+                  Category
+                </label>
+                <div
+                  className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 flex justify-between items-center cursor-pointer"
+                  onClick={() => setCategoryOpen(!categoryOpen)}
+                >
+                  <span>{categorySelected.label}</span>
+                  <ChevronDown className={`transition-transform ${categoryOpen ? 'rotate-180' : ''}`} size={18} />
+                </div>
+                {categoryOpen && (
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-borderColor rounded-xl shadow-md max-h-40 overflow-auto">
+                    {categoryOptions.map((option) => (
+                      <div
+                        key={option.value}
+                        onClick={() => { setCategorySelected(option); setCategoryOpen(false); }}
+                        className="p-3 hover:bg-[#F2F1EE] cursor-pointer"
+                      >
+                        {option.label}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+                Cover Image / Thumbnail
+              </label>
+              <div className="w-full aspect-video bg-[#FAF7F5] border border-borderColor rounded-4xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-[#F2F1EE] transition-colors relative group overflow-hidden">
+                {filePreview ? (
+                  <img src={filePreview} alt="Preview" className="w-full h-full object-cover rounded-4xl" />
+                ) : (
+                  <>
+                    <Plus className="text-gray-300 mb-2 group-hover:scale-110 transition-transform" size={32} />
+                    <span className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">Upload Asset</span>
+                  </>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setThumbnailFile(file);
+                    setFilePreview(URL.createObjectURL(file));
+                  }}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {typeSelected === 'Video' && (
+              <div className="space-y-2">
+                <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+                  Video File
+                </label>
+                <div className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 flex items-center justify-between relative hover:bg-[#F2F1EE] transition-colors cursor-pointer">
+                  <span className={videoFile ? 'text-sm text-[#4A4A4A]' : 'text-sm text-gray-300'}>
+                    {videoFile ? videoFile.name : 'Upload video file'}
+                  </span>
+                  <Plus className="text-gray-300" size={20} />
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setVideoFile(file);
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+                SEO Description
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Short summary for search results..."
+                className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 h-[140px] focus:ring-2 focus:ring-[#8B6E91]/20 outline-none resize-none placeholder:text-gray-300"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
+                Read/Watch Time (Mins)
+              </label>
+              <input
+                type="number"
+                value={time}
+                onChange={(e) => setTime(Number(e.target.value))}
+                className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 focus:ring-2 focus:ring-[#8B6E91]/20 outline-none"
+              />
+            </div>
+
+            <div className="bg-[#FAF7F5] border border-borderColor rounded-4xl p-4 md:p-6 space-y-4">
+              <label className="text-[10px] font-extrabold leading-4 tracking-[1px] text-buttonColor uppercase mb-4">Publishing Logic</label>
+              <div className="flex justify-between items-center mt-4">
+                <span className="text-sm text-[#4A3A3799] font-normal leading-4">Notify Users?</span>
+                <button
+                  onClick={() => setNotifyUsers(!notifyUsers)}
+                  className={`relative w-10 h-5 rounded-full transition-colors ${notifyUsers ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
+                >
+                  <div className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${notifyUsers ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-[#4A3A3799] font-normal leading-4">Locked content?</span>
+                <button
+                  onClick={() => setIsLocked(!isLocked)}
+                  className={`relative w-10 h-5 rounded-full transition-colors ${isLocked ? 'bg-[#8B6E91]' : 'bg-gray-300'}`}
+                >
+                  <div className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full transition-transform ${isLocked ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-13 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <button
+            onClick={() => window.history.back()}
+            className="flex-1 bg-[#FDFBF9] border border-borderColor text-[#D0021B] font-black uppercase tracking-widest py-5 rounded-[24px] hover:bg-red-50 transition-colors cursor-pointer"
+          >
+            Discard
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={isLoading}
+            className="flex-[1.5] bg-buttonColor text-white font-black uppercase tracking-widest py-5 rounded-[24px] hover:opacity-90 transition-opacity shadow-lg shadow-[#8B6E91]/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? 'Saving...' : 'Save'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CreateContentForm;
