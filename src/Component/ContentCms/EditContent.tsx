@@ -2,80 +2,45 @@ import React, { useState, useEffect } from 'react';
 import { ChevronDown, Plus, ChevronLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { RichTextEditor, VideoUpload } from './ContentEditors';
-import {
-  useGetContentByIdQuery,
-  useUpdateContentMutation,
-  type UpdateContentInput,
-
-} from '../../redux/features/admin/content/contentApi';
+import { useGetContentByIdQuery, useUpdateContentMutation, type UpdateContentInput } from '../../redux/features/admin/content/contentApi';
 import { toast } from 'react-toastify';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 type ContentType = 'Article' | 'Video';
-
 const typeOptions: ContentType[] = ['Article', 'Video'];
 
 const categoryOptions = [
-  'SYMPTOM_RELIEF', 'MENTAL_HEALTH', 'MEDICAL',
-  'WELLNESS', 'FITNESS', 'SLEEP_DISTURBANCES',
-  'MOOD_SWINGS', 'FATIGUE', 'HEADACHES',
+  { label: 'Hot Flashes',        value: 'HOT_FLASHES' },
+  { label: 'Night Sweats',       value: 'NIGHT_SWEATS' },
+  { label: 'Mood Swings',        value: 'MOOD_SWINGS' },
+  { label: 'Sleep Disturbances', value: 'SLEEP_DISTURBANCES' },
+  { label: 'Vaginal Dryness',    value: 'VAGINAL_DRYNESS' },
+  { label: 'Irregular Periods',  value: 'IRREGULAR_PERIODS' },
+  { label: 'Joint Pain',         value: 'JOINT_PAIN' },
+  { label: 'Headaches',          value: 'HEADACHES' },
+  { label: 'Fatigue',            value: 'FATIGUE' },
+  { label: 'Memory Problems',    value: 'MEMORY_PROBLEMS' },
 ];
 
-const categoryLabels: Record<string, string> = {
-  SYMPTOM_RELIEF: 'Symptom Relief',
-  MENTAL_HEALTH: 'Mental Health',
-  MEDICAL: 'Medical',
-  WELLNESS: 'Wellness',
-  FITNESS: 'Fitness',
-  SLEEP_DISTURBANCES: 'Sleep Disturbances',
-  MOOD_SWINGS: 'Mood Swings',
-  FATIGUE: 'Fatigue',
-  HEADACHES: 'Headaches',
-};
+const serverTypeToUI = (t?: string): ContentType => t === 'VIDEO' ? 'Video' : 'Article';
+const uiTypeToServer: Record<ContentType, 'ARTICLE' | 'VIDEO'> = { Article: 'ARTICLE', Video: 'VIDEO' };
 
-const serverTypeToUI = (t?: string): ContentType => {
-  if (t === 'VIDEO') return 'Video';
-  return 'Article';
-};
-
-const uiTypeToServer: Record<ContentType, 'ARTICLE' | 'VIDEO'> = {
-  Article: 'ARTICLE',
-  Video:   'VIDEO',
-};
-
-// ─── Dropdown ─────────────────────────────────────────────────────────────────
-function Dropdown<T extends string>({
-  label, value, options, labelMap, onChange,
-}: {
-  label: string;
-  value: T;
-  options: T[];
-  labelMap?: Record<string, string>;
-  onChange: (v: T) => void;
-}) {
+// ── Dropdown ──────────────────────────────────────────────────────────────────
+function TypeDropdown({ value, onChange }: { value: ContentType; onChange: (v: ContentType) => void }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="space-y-2 relative">
-      <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
-        {label}
-      </label>
+      <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">Type</label>
       <div
         className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 flex justify-between items-center cursor-pointer"
         onClick={() => setOpen(!open)}
       >
-        <span>{labelMap ? labelMap[value] ?? value : value}</span>
+        <span>{value}</span>
         <ChevronDown className={`transition-transform ${open ? 'rotate-180' : ''}`} size={18} />
       </div>
       {open && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-borderColor rounded-xl shadow-md">
-          {options.map((o) => (
-            <div
-              key={o}
-              onClick={() => { onChange(o); setOpen(false); }}
-              className="p-3 hover:bg-[#F2F1EE] cursor-pointer text-sm"
-            >
-              {labelMap ? labelMap[o] ?? o : o}
-            </div>
+          {typeOptions.map((o) => (
+            <div key={o} onClick={() => { onChange(o); setOpen(false); }} className="p-3 hover:bg-[#F2F1EE] cursor-pointer text-sm">{o}</div>
           ))}
         </div>
       )}
@@ -83,7 +48,31 @@ function Dropdown<T extends string>({
   );
 }
 
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
+function CategoryDropdown({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const selected = categoryOptions.find((c) => c.value === value);
+  return (
+    <div className="space-y-2 relative">
+      <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">Category</label>
+      <div
+        className="w-full bg-[#FAF7F5] border border-borderColor rounded-2xl p-4 flex justify-between items-center cursor-pointer"
+        onClick={() => setOpen(!open)}
+      >
+        <span>{selected?.label ?? value}</span>
+        <ChevronDown className={`transition-transform ${open ? 'rotate-180' : ''}`} size={18} />
+      </div>
+      {open && (
+        <div className="absolute z-10 w-full mt-1 bg-white border border-borderColor rounded-xl shadow-md max-h-48 overflow-auto">
+          {categoryOptions.map((o) => (
+            <div key={o.value} onClick={() => { onChange(o.value); setOpen(false); }} className="p-3 hover:bg-[#F2F1EE] cursor-pointer text-sm">{o.label}</div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Skeleton ──────────────────────────────────────────────────────────────────
 const EditSkeleton = () => (
   <div className="min-h-screen bg-[#FDFBF9] p-4 md:p-8 animate-pulse">
     <div className="h-4 w-40 bg-gray-200 rounded mb-6" />
@@ -98,7 +87,7 @@ const EditSkeleton = () => (
   </div>
 );
 
-// ─── Main Form ────────────────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────────
 const EditContentForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -106,7 +95,6 @@ const EditContentForm: React.FC = () => {
   const { data: item, isLoading, isError } = useGetContentByIdQuery(id!);
   const [updateContent, { isLoading: isSaving }] = useUpdateContentMutation();
 
-  // ── Form state ────────────────────────────────────────────────────────────
   const [title, setTitle]                       = useState('');
   const [seoDescription, setSeoDescription]     = useState('');
   const [readTime, setReadTime]                 = useState(5);
@@ -114,15 +102,12 @@ const EditContentForm: React.FC = () => {
   const [notifyUsers, setNotifyUsers]           = useState(true);
   const [isLocked, setIsLocked]                 = useState(false);
   const [typeSelected, setTypeSelected]         = useState<ContentType>('Article');
-  const [categorySelected, setCategorySelected] = useState('SYMPTOM_RELIEF');
+  const [categorySelected, setCategorySelected] = useState('HOT_FLASHES');
+  const [coverImageFile, setCoverImageFile]     = useState<File | null>(null);
+  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(null);
+  const [videoFile, setVideoFile]               = useState<File | null>(null);
+  const [articleBody, setArticleBody]           = useState('');
 
-  // ── File state ────────────────────────────────────────────────────────────
-  const [coverImageFile, setCoverImageFile]         = useState<File | null>(null);
-  const [coverImagePreview, setCoverImagePreview]   = useState<string | null>(null);
-  const [videoFile, setVideoFile]                   = useState<File | null>(null);
-  const [articleBody, setArticleBody]               = useState('');
-
-  // ── Populate form once data arrives ──────────────────────────────────────
   useEffect(() => {
     if (!item) return;
     setTitle(item.name ?? '');
@@ -132,12 +117,11 @@ const EditContentForm: React.FC = () => {
     setNotifyUsers(item.notify ?? true);
     setIsLocked(item.locked ?? false);
     setTypeSelected(serverTypeToUI(item.type));
-    setCategorySelected(item.category ?? 'SYMPTOM_RELIEF');
+    setCategorySelected(item.category ?? 'HOT_FLASHES');
     setCoverImagePreview(item.thumbnail ?? null);
     setArticleBody(item.description ?? '');
   }, [item]);
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
   const handleCoverImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -155,13 +139,12 @@ const EditContentForm: React.FC = () => {
     const toastId = toast.loading('Updating content...', { position: 'top-right' });
 
     try {
-      // ✅ Explicitly typed so TypeScript is satisfied — no widening to `string`
       const input: UpdateContentInput = {
         name:        title.trim(),
         description: seoDescription.trim() || undefined,
         time:        Number(readTime),
-        status:      isPublished ? 'PUBLISHED' : 'DRAFT',   // typed as literal
-        type:        uiTypeToServer[typeSelected],            // typed as literal
+        status:      isPublished ? 'PUBLISHED' : 'DRAFT',
+        type:        uiTypeToServer[typeSelected],
         category:    categorySelected,
         notify:      notifyUsers,
         locked:      isLocked,
@@ -170,12 +153,12 @@ const EditContentForm: React.FC = () => {
       await updateContent({
         id:        id!,
         input,
-        thumbnail: coverImageFile   ?? undefined,
-        video:     typeSelected === 'Video' ? (videoFile ?? undefined) : undefined,
+        thumbnail: coverImageFile ?? null,
+        video:     typeSelected === 'Video' ? (videoFile ?? null) : null,
       }).unwrap();
 
       toast.update(toastId, {
-        render: 'Content updated successfully! ✅',
+        render: 'Content updated successfully!',
         type: 'success',
         isLoading: false,
         autoClose: 3000,
@@ -187,8 +170,7 @@ const EditContentForm: React.FC = () => {
       console.error('Update error:', err);
       const msg =
         err?.data?.errors?.[0]?.message ||
-        err?.data?.message ||
-        err?.error ||
+        err?.message ||
         'Failed to update content.';
       toast.update(toastId, {
         render: msg,
@@ -200,24 +182,19 @@ const EditContentForm: React.FC = () => {
     }
   };
 
-  // ── Loading / error ───────────────────────────────────────────────────────
   if (isLoading) return <EditSkeleton />;
 
   if (isError || !item) return (
     <div className="min-h-screen flex items-center justify-center text-gray-400">
       <div className="text-center">
         <p className="text-lg font-bold">Content not found.</p>
-        <button onClick={() => navigate(-1)} className="mt-4 text-[#8B6E91] underline text-sm">
-          Go back
-        </button>
+        <button onClick={() => navigate(-1)} className="mt-4 text-[#8B6E91] underline text-sm">Go back</button>
       </div>
     </div>
   );
 
-  // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-[#FDFBF9] p-4 md:p-8 font-sans text-[#4A4A4A]">
-
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-[#8B6E91] uppercase mb-6 hover:opacity-70 transition-opacity"
@@ -227,7 +204,7 @@ const EditContentForm: React.FC = () => {
 
       <div className="max-w-7xl mx-auto bg-white rounded-[40px] shadow-sm border border-gray-100 p-8 md:p-12">
 
-        {/* ── Header ── */}
+        {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
           <div>
             <h1 className="text-titleColor text-xl sm:text-2xl md:text-[30px] font-extrabold leading-6 md:leading-[36px]">
@@ -253,10 +230,10 @@ const EditContentForm: React.FC = () => {
           </div>
         </div>
 
-        {/* ── Form Grid ── */}
+        {/* Form Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8 border-b border-borderColor pb-10">
 
-          {/* Left column */}
+          {/* Left */}
           <div className="space-y-6">
             <div className="space-y-2">
               <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
@@ -272,8 +249,8 @@ const EditContentForm: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Dropdown label="Type" value={typeSelected} options={typeOptions} onChange={setTypeSelected} />
-              <Dropdown label="Category" value={categorySelected} options={categoryOptions} labelMap={categoryLabels} onChange={setCategorySelected} />
+              <TypeDropdown value={typeSelected} onChange={setTypeSelected} />
+              <CategoryDropdown value={categorySelected} onChange={setCategorySelected} />
             </div>
 
             <div className="space-y-2">
@@ -299,7 +276,7 @@ const EditContentForm: React.FC = () => {
             </div>
           </div>
 
-          {/* Right column */}
+          {/* Right */}
           <div className="space-y-6">
             <div className="space-y-2">
               <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase">
@@ -351,7 +328,7 @@ const EditContentForm: React.FC = () => {
           </div>
         </div>
 
-        {/* ── Dynamic Content Section ── */}
+        {/* Dynamic Section */}
         <div className="mt-10">
           {typeSelected === 'Article' && (
             <div className="space-y-3">
@@ -361,7 +338,6 @@ const EditContentForm: React.FC = () => {
               <RichTextEditor initialValue={articleBody} onChange={setArticleBody} />
             </div>
           )}
-
           {typeSelected === 'Video' && (
             <div className="space-y-3">
               <label className="text-[10px] font-extrabold leading-4 tracking-[2px] text-subTitleColor uppercase block">
@@ -375,7 +351,7 @@ const EditContentForm: React.FC = () => {
           )}
         </div>
 
-        {/* ── Footer ── */}
+        {/* Footer */}
         <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
           <button
             onClick={() => navigate(-1)}

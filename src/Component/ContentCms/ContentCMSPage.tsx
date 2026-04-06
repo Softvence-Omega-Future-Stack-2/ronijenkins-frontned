@@ -8,7 +8,7 @@ import {
 } from "../../redux/features/admin/content/contentApi";
 import { toast } from "react-toastify";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+
 type TabKey = "all" | "articles" | "video-guides";
 
 const tabs: { key: TabKey; label: string }[] = [
@@ -170,10 +170,12 @@ export default function ContentCMS() {
   const LIMIT = 5;
   const navigate = useNavigate();
 
-  const { data: result, isLoading, isError } = useGetAllContentsQuery(
-    { page: currentPage, limit: LIMIT },
-    { refetchOnMountOrArgChange: true },
-  );
+const { data: result, isLoading, isFetching, isError } = useGetAllContentsQuery(
+  { page: currentPage, limit: LIMIT },
+);
+console.log('🔍 currentPage:', currentPage, '| isFetching:', isFetching, '| data count:', result?.data?.length);
+
+// isFetching দিয়ে page change এর সময় loading দেখান
 
   const [deleteContent] = useDeleteContentMutation();
 
@@ -263,9 +265,9 @@ export default function ContentCMS() {
 
       {/* Content Grid */}
       <div className="bg-white rounded-2xl md:rounded-[40px] p-3 md:p-8 border border-borderColor">
-        {isLoading ? (
-          <ContentSkeleton />
-        ) : isError ? (
+        {(isLoading || isFetching) ? (
+  <ContentSkeleton />
+) : isError ? (
           <div className="text-center text-red-400 py-12 text-sm">
             Failed to load content. Please try again.
           </div>
@@ -276,11 +278,11 @@ export default function ContentCMS() {
                 <ContentCard key={item.id} item={item} onDelete={handleDeleteClick} />
               ))}
             </div>
-            <Pagination
-              currentPage={meta.page}
-              totalPage={meta.totalPage}
-              onPageChange={handlePageChange}
-            />
+           <Pagination
+  currentPage={currentPage}   // ← state থেকে নিন, meta থেকে না
+  totalPage={meta.totalPage}
+  onPageChange={handlePageChange}
+/>
           </>
         ) : (
           <div className="text-center text-[#c4b8e8] py-12 text-sm">
