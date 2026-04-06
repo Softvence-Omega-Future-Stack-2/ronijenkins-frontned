@@ -14,6 +14,7 @@ export interface CreateContentInput {
 }
  
 export interface UpdateContentInput {
+  
   name?: string;
   description?: string;
   time?: number;
@@ -60,17 +61,8 @@ getAllContents: build.query({
       query: `
         query getAllContents($input: GetAllGenericArgs) {
           getAllContents(input: $input) {
-            id
-            name
-            slug
-            description
-            thumbnail
-            videoUrl
-            status
-            type
-            time
-            category
-            createdAt
+            id name slug description thumbnail videoUrl
+            status type time category createdAt
           }
         }
       `,
@@ -84,16 +76,19 @@ getAllContents: build.query({
       },
     },
   }),
-  // ✅ server returns { meta, data: [...] } directly — NOT under data.getAllContents
-  transformResponse: (response: any) => {
-    console.log("📥 raw response:", response);
-    return {
-      data: response?.data ?? [],
-      meta: response?.meta ?? { page: 1, limit: 10, total: 0, totalPage: 1 },
-    };
-  },
-  // providesTags: ["Content"],
-  providesTags: [{ type: "Content" as const, id: "LIST" }],
+transformResponse: (response: any) => {
+  console.log("📥 page response:", JSON.stringify(response));
+  return {
+    data: response?.data ?? [],
+    meta: response?.meta ?? { page: 1, limit: 5, total: 0, totalPage: 1 },
+  };
+},
+  providesTags: (_result, _err, arg) => [
+    { type: "Content" as const, id: "LIST" },
+    { type: "Content" as const, id: `LIST-PAGE-${arg?.page ?? 1}` },
+  ],
+  keepUnusedDataFor: 0, 
+  forceRefetch: () => true, 
 }),
 
     // ================= GET CONTENT BY ID =================
@@ -142,8 +137,7 @@ createContent: build.mutation({
   query: (data: { input: any; thumbnail?: File | null; video?: File | null }) => {
     const formData = new FormData();
 
-    // ১. অপারেশনস তৈরি করা
-    const operations = {
+    const operations = JSON.stringify({
       query: `
         mutation createContent($input: CreateContentInput!, $thumbnail: Upload, $video: Upload) {
           createContent(input: $input, thumbnail: $thumbnail, video: $video) {
@@ -155,89 +149,140 @@ createContent: build.mutation({
           }
         }
       `,
-      variables: { 
-        input: data.input, 
-        thumbnail: null, 
-        video: null 
+      variables: {
+        input: data.input,
+        thumbnail: null,
+        video: null,
       },
-    };
-    formData.append("operations", JSON.stringify(operations));
+    });
 
-    // ২. ডাইনামিক ম্যাপ তৈরি (ফাইল থাকলেই কেবল অ্যাড হবে)
- const map: Record<string, string[]> = {};
-let fileIndex = 0;
+formData.append("operations", operations);
 
-if (data.thumbnail) {
-  map[fileIndex] = ["variables.thumbnail"];
-  formData.append(String(fileIndex), data.thumbnail);
-  fileIndex++;
-}
 
-if (data.video) {
-  map[fileIndex] = ["variables.video"];
-  formData.append(String(fileIndex), data.video);
-  fileIndex++;
-}
+const map: Record<string, string[]> = {};
+if (data.thumbnail) map["0"] = ["variables.thumbnail"];
+if (data.video)     map["1"] = ["variables.video"];
+formData.append("map", JSON.stringify(map))
+const files: File[] = [];
+
+if (data.thumbnail) formData.append("0", data.thumbnail);
+if (data.video)     formData.append("1", data.video);
 
 formData.append("map", JSON.stringify(map));
 
-    
-  
 
+files.forEach((file, index) => {
+  formData.append(String(index), file);
+});
+// debug
+for (const pair of formData.entries()) {
+  console.log('FormData entry:', pair[0], pair[1]);
+}
+// return এর আগে
+for (const pair of formData.entries()) {
+  console.log('FormData:', pair[0], pair[1]);
+}
     return {
-      url: "", // আপনার baseApi-তে যদি /graphql দেওয়া থাকে তবে এটি খালি রাখুন
+      url: "",
       method: "POST",
       body: formData,
-      // RTK Query স্বয়ংক্রিয়ভাবে Content-Type সেট করবে যদি আপনি এটি undefined রাখেন
+      formData: true,
     };
-
-    
   },
+transformResponse: (response: any) => {
+  console.log('createContent raw:', response);
   
-  invalidatesTags: ["Content"],
+  // GraphQL error check
+  if (response?.errors?.length) {
+    throw new Error(response.errors[0].message);
+  }
+  
+  return response?.data?.createContent ?? response;
+},
+  invalidatesTags: [{ type: "Content" as const, id: "LIST" }],
 }),
-
     // UPDATE CONTENT 
-updateContent: build.mutation<
-      ContentItem,
-      { id: string; input: UpdateContentInput; thumbnail?: File | null; video?: File | null }
-    >({
-      query: ({ id, input, thumbnail, video }) => {
-        const formData = new FormData();
- 
-        const operations = JSON.stringify({
-          query: `
-            mutation updateContent(
-              $id: ID!
-              $input: UpdateContentInput!
-              $thumbnail: Upload
-              $video: Upload
-            ) {
-              updateContent(id: $id, input: $input, thumbnail: $thumbnail, video: $video) {
-                ${CONTENT_FIELDS}
-              }
-            }
-          `,
-          variables: { id, input, thumbnail: null, video: null },
-        });
- 
-        formData.append('operations', operations);
- 
-        const map: Record<string, string[]> = {};
-        if (thumbnail) map['0'] = ['variables.thumbnail'];
-        if (video)     map['1'] = ['variables.video'];
-        formData.append('map', JSON.stringify(map));
- 
-        if (thumbnail) formData.append('0', thumbnail);
-        if (video)     formData.append('1', video);
- 
-        return { url: '', method: 'POST', body: formData };
+    updateContent: build.mutation<
+  ContentItem,
+  {
+    id: string;
+    input: UpdateContentInput;
+    thumbnail?: File | null;
+    video?: File | null;
+  }
+>({
+  query: ({ id, input, thumbnail, video }) => {
+    const formData = new FormData();
+
+    const operations = JSON.stringify({
+      query: `
+        mutation updateContent(
+          $id: String! 
+          $input: UpdateContentInput!
+          $thumbnail: Upload
+          $video: Upload
+        ) {
+          updateContent(
+            id: $id
+            input: $input
+            thumbnail: $thumbnail
+            video: $video
+          ) {
+            ${CONTENT_FIELDS}
+          }
+        }
+      `,
+      variables: {
+        id,
+        input,
+        thumbnail: null,
+        video: null,
       },
-      transformResponse: (response: any): ContentItem =>
-        response?.data?.updateContent ?? response?.updateContent,
-      // Invalidate both the specific item and the whole list
-      invalidatesTags: (_result, _err, { id }) => [{ type: 'Content', id }, 'Content'],
-    }),
+    });
+
+    formData.append("operations", operations);
+
+    // 🔥 dynamic map (safe way)
+    const map: Record<string, string[]> = {};
+    let i = 0;
+
+    if (thumbnail) {
+      map[i] = ["variables.thumbnail"];
+      formData.append(i.toString(), thumbnail);
+      i++;
+    }
+
+    if (video) {
+      map[i] = ["variables.video"];
+      formData.append(i.toString(), video);
+    }
+
+    formData.append("map", JSON.stringify(map));
+
+    return {
+      url: "/graphql", // ✅ important
+      method: "POST",
+      body: formData,
+      formData: true,
+    };
+  },
+
+  transformResponse: (response: any): ContentItem => {
+    console.log("updateContent raw:", response);
+
+    // ✅ GraphQL error handle
+    if (response?.errors?.length > 0) {
+      throw new Error(response.errors[0].message);
+    }
+
+    return response?.data?.updateContent;
+  },
+
+  invalidatesTags: (_result, _err, { id }) => [
+    { type: "Content", id },
+    { type: "Content", id: "LIST" },
+  ],
+}),
  
 
 

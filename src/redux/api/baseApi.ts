@@ -42,6 +42,7 @@ const baseQueryWithReauth = async (
   const isFormData = args?.body instanceof FormData;
   let result: any;
 
+  
   if (isFormData) {
     const state = api.getState() as RootState;
     let token = state.auth.token;
