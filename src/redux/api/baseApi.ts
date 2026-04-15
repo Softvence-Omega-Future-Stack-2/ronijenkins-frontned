@@ -6,7 +6,7 @@ import { setCredentials, logout } from "../features/auth/authSlice";
 const baseQuery = fetchBaseQuery({
   baseUrl:
     import.meta.env.VITE_API_URL ||
-    "https://ronijenkinsserver-production.up.railway.app/graphql",
+    "http://13.51.155.66:8989/graphql",
 
   prepareHeaders: (headers, { getState, endpoint }) => {
     const state = getState() as RootState;
@@ -21,7 +21,7 @@ const baseQuery = fetchBaseQuery({
 
     if (!token || token === "undefined" || token === "null") token = null;
 
-    const publicEndpoints = ["login", "register", "verifyOTP", "forgotPassword", "resetPassword"];
+    const publicEndpoints = ["login", "register", "verifyOTP", "forgotPassword", "resetPassword", ];
     const isPublic = publicEndpoints.some((e) =>
       endpoint?.toLowerCase().includes(e.toLowerCase())
     );
@@ -161,7 +161,7 @@ const baseQueryWithReauth = async (
 export const baseAPI = createApi({
   reducerPath: "baseAPI",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["Auth", "Broadcast", "Overview", "Content", "AdminProfile", "Users", "HealthGoals","Customers", "Subscription", "Appointments", "Notifications"],
+  tagTypes: ["Auth", "Broadcast", "Overview", "Content", "AdminProfile", "Users", "HealthGoals","Customers", "Subscription", "Appointments", "Notifications","MedicalHistory","Symptoms","Payments"],
   endpoints: () => ({}),
 });
 

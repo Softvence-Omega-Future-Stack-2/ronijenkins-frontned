@@ -91,7 +91,7 @@ transformResponse: (response: any) => {
   forceRefetch: () => true, 
 }),
 
-    // ================= GET CONTENT BY ID =================
+
   getContentById: build.query({
   query: (id: string) => ({
     url: "",
@@ -107,7 +107,7 @@ transformResponse: (response: any) => {
       variables: { id },
     },
   }),
-  // ✅ response.data.getContentById — এটা ঠিক আছে কিনা check করি
+
   transformResponse: (response: any) => {
     console.log(" getContentById raw:", response);
     return response?.data?.getContentById ?? response?.data ?? null;

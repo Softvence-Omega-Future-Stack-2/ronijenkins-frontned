@@ -3,7 +3,51 @@ import { baseAPI } from "../../api/baseApi";
 
 export const subscriptionAPI = baseAPI.injectEndpoints({
   endpoints: (build) => ({
-    // ১. সকল সাবস্ক্রিপশন লিস্ট দেখার জন্য
+
+
+   getPayments: build.query({
+  query: ({ page = 1, limit = 10 }) => ({
+    method: "POST",
+    body: {
+      query: `
+        query payments($input: GetAllGenericArgs) {
+          payments(input: $input) {
+            amount
+            createdAt
+            currency
+            customerId
+            id
+            paymentDate
+            paymentStatus
+            subscriptionId
+            subscriptionPlanId
+            updatedAt
+          }
+        }
+      `,
+      variables: {
+        input: {
+          pagination: {
+            limit,
+            page,
+          },
+        },
+      },
+    },
+  }),
+
+transformResponse: (response: any) => {
+  console.log("FULL RESPONSE 👉", response);
+
+  return {
+    payments: response?.data || [], 
+    meta: response?.meta || {},
+  };
+},
+
+  providesTags: ["Payments"],
+}),
+
    getSubscriptionPlans: build.query({
       query: (params?: { page?: number; limit?: number }) => ({
         url: "",
@@ -35,11 +79,11 @@ export const subscriptionAPI = baseAPI.injectEndpoints({
           },
         },
       }),
-      // ডাটা সরাসরি 'data' তে আছে কি না কনসোল করে শিওর হয়ে নিন
+  
       transformResponse: (response: any) => response, 
       providesTags: ["Subscription"],
     }),
-    // ২. নতুন সাবস্ক্রিপশন প্ল্যান তৈরি করার জন্য (যদি লাগে)
+
 createSubscriptionPlan: build.mutation({
   query: (data) => ({
     url: "",
@@ -58,7 +102,7 @@ createSubscriptionPlan: build.mutation({
           name: data.name,
           description: data.description,
           features: data.features,
-          plan: data.plan,          // "Monthly" or "Yearly"
+          plan: data.plan,          
           price: Number(data.price),
           status: data.status,
           trialPeriod: data.trialPeriod,
@@ -142,6 +186,7 @@ removeSubscriptionPlan: build.mutation({
 });
 
 export const { 
+  useGetPaymentsQuery,
   useGetSubscriptionPlansQuery, 
   useCreateSubscriptionPlanMutation, 
   useUpdateSubscriptionPlanMutation,
