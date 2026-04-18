@@ -14,10 +14,8 @@ import { useGetSystemOverviewQuery } from '../../redux/features/admin/systemOver
 const UserEngagementChart: React.FC = () => {
   const { data: statsData, isLoading } = useGetSystemOverviewQuery(undefined);
 
-  // ব্যাকএন্ড থেকে এনগেজমেন্ট ডাটা
   const engagement = statsData?.engagement;
 
-  // ব্যাকএন্ডে টাইম সিরিজ ডাটা নেই, তাই ডামি/জেনেরেটেড ডেটা বানাচ্ছি
   const chartData = Array.from({ length: 7 }).map((_, i) => ({
     name: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i],
     users: Math.floor((engagement?.totalPosts || 0) / 7 + Math.random() * 20),
