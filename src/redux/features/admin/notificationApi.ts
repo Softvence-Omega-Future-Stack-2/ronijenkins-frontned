@@ -9,22 +9,15 @@ export const notificationApi = baseAPI.injectEndpoints({
           query: `
             query getNotifications($input: GetAllGenericArgs) {
               getNotifications(input: $input) {
-                meta {
-                  page
-                  limit
-                  total
-                  totalPage
-                }
-                data {
-                  id
-                  title
-                  body
-                  read
-                  type
-                  createdAt
-                  updatedAt
-                  userId
-                }
+                body
+                createdAt
+                data
+                id
+                read
+                title
+                type
+                updatedAt
+                userId
               }
             }
           `,
@@ -44,10 +37,19 @@ export const notificationApi = baseAPI.injectEndpoints({
         }),
       }),
 
-      transformResponse: (res: any) => ({
-        notifications: res?.data?.getNotifications?.data || [],
-        meta: res?.data?.getNotifications?.meta || {},
-      }),
+transformResponse: (res: any) => {
+  console.log("RAW API RESPONSE:", res);
+
+  return {
+    notifications: res?.data || [], 
+    meta: res?.meta || {
+      page: 1,
+      limit: 10,
+      total: 0,
+      totalPage: 1,
+    },
+  };
+},
 
       providesTags: ["Notifications"],
     }),
@@ -71,4 +73,86 @@ export const notificationApi = baseAPI.injectEndpoints({
 export const {
   useGetNotificationsQuery,
   useMarkAllNotificationsAsReadMutation,
-} = notificationApi;
+} = notificationApi;   
+
+
+
+
+
+
+// import { baseAPI } from "../../api/baseApi";
+
+// export const notificationApi = baseAPI.injectEndpoints({
+//   endpoints: (build) => ({
+//    // notificationApi.ts
+// getNotifications: build.query({
+//   query: ({ page = 1, limit = 10 }) => ({
+//     method: "POST",
+//     body: JSON.stringify({
+//       query: `
+//         query getNotifications($input: GetAllGenericArgs) {
+//           getNotifications(input: $input) {
+//             meta {
+//               page
+//               limit
+//               total
+//               totalPage
+//             }
+//             data {
+//               id
+//               userId
+//               type
+//               title
+//               body
+//               data
+//               read
+//               createdAt
+//               updatedAt
+//             }
+//           }
+//         }
+//       `,
+//       variables: {
+//         input: {
+//           pagination: {
+//             page,
+//             limit,
+//           },
+//           searchTerm: "",
+//           sortBy: {
+//             field: "createdAt",
+//             order: "desc",
+//           },
+//         },
+//       },
+//     }),
+//   }),
+
+//   transformResponse: (res: any) => ({
+//     notifications: res?.data?.getNotifications?.data || [],
+//     meta: res?.data?.getNotifications?.meta || {},
+//   }),
+
+//   providesTags: ["Notifications"],
+// }),
+
+//     markAllNotificationsAsRead: build.mutation<void, void>({
+//       query: () => ({
+//         method: "POST",
+//         body: JSON.stringify({
+//           query: `
+//             mutation {
+//               markAllNotificationsAsRead
+//             }
+//           `,
+//         }),
+//       }),
+//       invalidatesTags: ["Notifications"],
+//     }),
+//   }),
+// });
+
+// export const {
+//   useGetNotificationsQuery,
+//   useMarkAllNotificationsAsReadMutation,
+// } = notificationApi;
